@@ -3,6 +3,7 @@ import {
   POLICY_DEFINITIONS,
   buildPolicyState,
   defaultPolicyValues,
+  isBlockedAttachment,
   policyValue
 } from '@shared/policy'
 
@@ -65,5 +66,15 @@ describe('политики', () => {
         expect(definition.enum).toContain(definition.default)
       }
     }
+  })
+
+  it('блокирует опасные вложения по списку расширений', () => {
+    const blocked = ['exe', 'ps1', 'lnk']
+    expect(isBlockedAttachment('invoice.PDF', blocked)).toBe(false)
+    expect(isBlockedAttachment('setup.EXE', blocked)).toBe(true)
+    expect(isBlockedAttachment('script.ps1 ', blocked)).toBe(true)
+    expect(isBlockedAttachment('без-расширения', blocked)).toBe(false)
+    expect(isBlockedAttachment('archive.exe.txt', blocked)).toBe(false)
+    expect(isBlockedAttachment('anything.exe', undefined)).toBe(false)
   })
 })

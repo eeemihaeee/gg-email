@@ -116,7 +116,7 @@ export class AccountSyncer {
   private async connect(): Promise<void> {
     if (this.stopped) return
     this.setStatus({ phase: 'connecting' })
-    const client = createImapClient(this.account)
+    const client = await createImapClient(this.account)
     this.client = client
 
     client.on('error', (error: Error) => {

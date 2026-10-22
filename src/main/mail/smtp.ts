@@ -2,18 +2,31 @@ import { createTransport, type Transporter } from 'nodemailer'
 import MailComposer from 'nodemailer/lib/mail-composer'
 import type { Account, DraftPayload, SendResult, ServerEndpoint } from '@shared/types'
 import { secrets } from '../secrets'
+import { cachedPolicy } from '../policy'
+import { accessToken } from './oauth'
 import { createLogger } from '../logger'
 import { formatAddress } from '@shared/providers'
 
 const log = createLogger('smtp')
 
-function transportOptions(endpoint: ServerEndpoint, user: string, pass: string) {
+interface AuthOptions {
+  user: string
+  pass?: string
+  accessToken?: string
+  type?: 'OAuth2'
+}
+
+function transportOptions(endpoint: ServerEndpoint, auth: AuthOptions) {
+  const authConfig =
+    auth.type === 'OAuth2'
+      ? { type: 'OAuth2' as const, user: auth.user, accessToken: auth.accessToken }
+      : { user: auth.user, pass: auth.pass }
   return {
     host: endpoint.host,
     port: endpoint.port,
     secure: endpoint.security === 'tls',
     requireTLS: endpoint.security === 'starttls',
-    auth: { user, pass },
+    auth: authConfig,
     connectionTimeout: 20_000,
     greetingTimeout: 15_000,
     socketTimeout: 60_000,
@@ -25,12 +38,22 @@ function transportOptions(endpoint: ServerEndpoint, user: string, pass: string) 
   }
 }
 
+async function authFor(account: Account): Promise<AuthOptions> {
+  const value = secrets.get(account.id)
+  if (!value) throw new Error('Нет сохранённого пароля')
+  if (account.authKind === 'oauth2') {
+    const token = await accessToken(account.id, account.oauthProvider ?? 'google', cachedPolicy())
+    return { type: 'OAuth2', user: account.username, accessToken: token }
+  }
+  return { user: account.username, pass: value }
+}
+
 export async function testSmtpConnection(
   endpoint: ServerEndpoint,
   user: string,
   pass: string
 ): Promise<{ ok: boolean; error?: string }> {
-  const transport = createTransport(transportOptions(endpoint, user, pass))
+  const transport = createTransport(transportOptions(endpoint, { user, pass }))
   try {
     await transport.verify()
     return { ok: true }
@@ -82,14 +105,10 @@ export async function sendPrepared(
   account: Account,
   prepared: PreparedMessage
 ): Promise<SendResult> {
-  const password = secrets.get(account.id)
-  if (!password) return { ok: false, error: 'Нет сохранённого пароля' }
-
   let transport: Transporter | null = null
   try {
-    transport = createTransport(
-      transportOptions(account.smtp, account.username, password)
-    )
+    const auth = await authFor(account)
+    transport = createTransport(transportOptions(account.smtp, auth))
     const info = await transport.sendMail({
       envelope: prepared.envelope,
       raw: prepared.raw

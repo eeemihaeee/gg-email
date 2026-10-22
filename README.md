@@ -40,14 +40,13 @@ Thunderbird плохо подходит для управляемого парк
 Требуется Node.js 22+ (проект проверен на Node 22.21 / Electron 45).
 
 ```powershell
-npm install --ignore-scripts   # electron скачивается отдельно, см. ниже
-node node_modules/electron/install.js
+npm install
 npm run dev
 ```
 
-> В изолированных средах, где запрещены lifecycle-скрипты npm, установка выполняется
-> командой `npm install --ignore-scripts` и ручным запуском `install.js`
-> (переменная `electron_config_cache` задаёт каталог загрузки).
+> Если среда запрещает lifecycle-скрипты npm (песочницы, некоторые CI), используйте
+> `npm install --ignore-scripts` и затем `node node_modules/electron/install.js`.
+> Переменная `electron_config_cache` задаёт каталог загрузки бинарника.
 
 Сборка и установщик:
 
@@ -60,7 +59,7 @@ npm run dist         # release/Kurier-Setup-<версия>.exe (NSIS, per-user)
 
 ```powershell
 npm run typecheck    # main + renderer
-npm test             # 21 модульный тест (vitest)
+npm test             # 22 модульных теста (vitest)
 npm run admx         # перегенерировать ADMX/ADML/README из каталога политик
 ```
 
@@ -115,11 +114,11 @@ build/             иконка и NSIS-включения
 Собрано и проверено в этой итерации:
 
 - установщик `release/Kurier-Setup-0.1.0.exe` (110 МБ, SHA-256
-  `DCCD152E…F6E1AE3`), `latest.yml` и blockmap для дифференциальных обновлений;
+  `3A87039F3C4F03893727BB12135F278B1053D3F3E7E9E25665D6720A93F2E420`), `latest.yml` и blockmap для дифференциальных обновлений;
 - `app.asar` (25,6 МБ) содержит `out/main`, `out/preload`, `out/renderer` и
   production-зависимости;
 - сборка `electron-vite`, строгая типизация TypeScript (main + renderer);
-- 21 модульный тест: политики, роли папок, кеш SQLite, FTS-поиск, флаги,
+- 22 модульных теста: политики, роли папок, кеш SQLite, FTS-поиск, флаги,
   перемещение писем, сжатие тел, вытеснение кеша;
 - интерфейс — скриншоты сняты с собранного renderer-а в headless Chromium
   (демо-режим `?demo=1`, синтетические данные);

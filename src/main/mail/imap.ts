@@ -2,6 +2,8 @@ import { ImapFlow } from 'imapflow'
 import type { Account, AuthKind, MessageFlags, ServerEndpoint } from '@shared/types'
 import { createLogger } from '../logger'
 import { secrets } from '../secrets'
+import { cachedPolicy } from '../policy'
+import { accessToken } from './oauth'
 
 const log = createLogger('imap')
 
@@ -11,11 +13,14 @@ export interface ImapCredentials {
   accessToken?: string
 }
 
-export function credentialsFor(account: Account): ImapCredentials {
+export async function credentialsFor(account: Account): Promise<ImapCredentials> {
   const kind: AuthKind = account.authKind
   const value = secrets.get(account.id)
   if (!value) throw new Error('Нет сохранённого пароля для учётной записи')
-  if (kind === 'oauth2') return { user: account.username, accessToken: value }
+  if (kind === 'oauth2') {
+    const token = await accessToken(account.id, account.oauthProvider ?? 'google', cachedPolicy())
+    return { user: account.username, accessToken: token }
+  }
   return { user: account.username, pass: value }
 }
 
@@ -43,8 +48,8 @@ export function buildClientOptions(
   }
 }
 
-export function createImapClient(account: Account): ImapFlow {
-  const auth = credentialsFor(account)
+export async function createImapClient(account: Account): Promise<ImapFlow> {
+  const auth = await credentialsFor(account)
   return new ImapFlow(buildClientOptions(account.imap, auth))
 }
 
