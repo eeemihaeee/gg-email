@@ -53,7 +53,17 @@ export default function SetupWizard(): React.JSX.Element {
 
   const patch = (values: Partial<FormState>): void => setForm((current) => ({ ...current, ...values }))
 
+  const oauthReady = (provider?: 'google' | 'yandex'): boolean => {
+    if (!provider) return false
+    return provider === 'google'
+      ? Boolean(policy.values.googleClientId)
+      : Boolean(policy.values.yandexClientId)
+  }
+
   const applyAutoconfig = (result: AutoconfigResult): void => {
+    // Если администратор не настроил OAuth, предлагаем пароль приложения,
+    // а не тупиковый сценарий «OAuth не настроен».
+    const useOAuth = Boolean(result.oauthProvider) && oauthReady(result.oauthProvider)
     patch({
       imapHost: result.imap.host,
       imapPort: result.imap.port,
@@ -62,7 +72,7 @@ export default function SetupWizard(): React.JSX.Element {
       smtpPort: result.smtp.port,
       smtpSecurity: result.smtp.security,
       username: result.username,
-      authKind: result.oauthProvider ? 'oauth2' : 'password',
+      authKind: useOAuth ? 'oauth2' : 'password',
       oauthProvider: result.oauthProvider,
       source: result.source
     })
@@ -78,11 +88,12 @@ export default function SetupWizard(): React.JSX.Element {
         setStep('server')
       } else {
         const preset = presetForEmail(form.email)
+        const useOAuth = preset?.authKind === 'oauth2' && oauthReady(preset.oauthProvider)
         patch({
           imapHost: form.imapHost || `imap.${form.email.split('@')[1] ?? ''}`,
           smtpHost: form.smtpHost || `smtp.${form.email.split('@')[1] ?? ''}`,
           username: form.email,
-          authKind: preset?.authKind ?? 'password',
+          authKind: useOAuth ? 'oauth2' : 'password',
           oauthProvider: preset?.oauthProvider,
           source: 'guess'
         })
@@ -262,6 +273,18 @@ export default function SetupWizard(): React.JSX.Element {
                 </button>
               </div>
             )}
+
+            {form.authKind !== 'oauth2' &&
+              (form.oauthProvider === 'google' || form.oauthProvider === 'yandex') &&
+              !oauthConfigured && (
+                <div className="form-info">
+                  OAuth для {form.oauthProvider === 'google' ? 'Gmail' : 'Яндекса'} не настроен
+                  администратором. Используйте пароль приложения:{' '}
+                  {form.oauthProvider === 'google'
+                    ? 'Google Аккаунт → Безопасность → Пароли приложений (нужна 2FA).'
+                    : 'Яндекс ID → Безопасность → Пароли приложений.'}
+                </div>
+              )}
 
             <label className="field">
               <span>{form.authKind === 'oauth2' ? 'Токен (заполнится после входа)' : 'Пароль приложения'}</span>

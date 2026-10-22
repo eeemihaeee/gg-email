@@ -19,10 +19,36 @@ import { createImapClient, flagsToMask as imapFlagsToMask, normalizeAddresses, p
 import { parseRawMessage, makeSnippet } from './mime'
 import { buildRawMessage, sendPrepared } from './smtp'
 
+function describeError(error: unknown): string {
+  if (typeof error === 'string') return error
+  const value = error as {
+    message?: string
+    responseText?: string
+    serverResponseCode?: string
+    authenticationFailed?: boolean
+  }
+  const parts = [value.message ?? String(error)]
+  if (value.responseText && !parts.includes(value.responseText)) parts.push(value.responseText)
+  if (value.serverResponseCode) parts.push(value.serverResponseCode)
+  return parts.filter(Boolean).join(' · ')
+}
+
 function friendlyError(message: string): string {
   const value = message.toLowerCase()
-  if (value.includes('command failed') || value.includes('authentication') || value.includes('invalid credentials') || value.includes('auth')) {
-    return 'Сервер отклонил вход: проверьте логин и пароль приложения (для Gmail/Яндекса нужен пароль приложения или OAuth)'
+  if (
+    value.includes('command failed') ||
+    value.includes('authentication') ||
+    value.includes('invalid credentials') ||
+    value.includes('auth')
+  ) {
+    const code = message.match(/AUTHENTICATIONFAILED|LOGIN failed|\[[A-Z_]+\]/i)?.[0]
+    const detail = code ? ` Код сервера: ${code}.` : ''
+    return (
+      'Сервер отклонил логин или пароль. В mailcow проверьте пароль ящика и доступ по IMAP/SMTP ' +
+      '(после нескольких неудачных попыток возможен временный бан fail2ban); для Gmail и Яндекса ' +
+      'нужен пароль приложения (или OAuth).' +
+      detail
+    )
   }
   if (value.includes('certificate') || value.includes('self signed')) {
     return 'Сертификат сервера не доверенный: обратитесь в ИТ-отдел'
@@ -140,7 +166,7 @@ export class AccountSyncer {
     this.connecting = true
 
     client.on('error', (error: Error) => {
-      this.lastError = error.message
+      this.lastError = describeError(error)
       log.warn(`Ошибка соединения ${this.account.email}`, error.message)
     })
     client.on('close', () => {
@@ -173,7 +199,7 @@ export class AccountSyncer {
       this.connecting = false
     } catch (error) {
       this.connecting = false
-      const message = error instanceof Error ? error.message : String(error)
+      const message = describeError(error)
       this.lastError = message
       this.handleDisconnect(friendlyError(message))
       return
