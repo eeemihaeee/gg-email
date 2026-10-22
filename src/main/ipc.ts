@@ -41,7 +41,7 @@ const DEFAULT_SETTINGS: UserSettings = {
   signature: ''
 }
 
-const COLORS = ['#2f6fed', '#0f9d58', '#c5221f', '#f29900', '#7b1fa2', '#00838f']
+const COLORS = ['#f23c30', '#f2994a', '#27ae60', '#2d9cdb', '#9b51e0', '#eb5757']
 
 function assertTrusted(event: IpcMainInvokeEvent): void {
   const url = event.senderFrame?.url ?? ''
@@ -52,12 +52,8 @@ function assertTrusted(event: IpcMainInvokeEvent): void {
   if (!trusted) throw new Error('Недоверенный источник IPC-запроса')
 }
 
-function handle<T>(channel: string, fn: (event: IpcMainInvokeEvent, ...args: any[]) => Promise<T> | T): void {
-  ipcMain.handle(channel, async (event, ...args) => {
-    assertTrusted(event)
-    return fn(event, ...args)
-  })
-}
+export type ApiHandler = (event: IpcMainInvokeEvent, ...args: any[]) => Promise<unknown> | unknown
+export type ApiHandlers = Record<string, ApiHandler>
 
 function validateAccountInput(input: AccountInput): void {
   if (!input?.email || !isValidEmail(input.email)) throw new Error('Некорректный адрес почты')
@@ -72,13 +68,29 @@ function validateAccountInput(input: AccountInput): void {
   }
 }
 
-export function registerIpc(ctx: AppContext, getWindow: () => BrowserWindow | null): void {
+/**
+ * Обработчики API не зависят от транспорта: их использует и Electron IPC,
+ * и встроенный веб-сервер (режим «GG Email в браузере»).
+ */
+export function createApiHandlers(
+  ctx: AppContext,
+  getWindow: () => BrowserWindow | null
+): ApiHandlers {
+  const handlers: ApiHandlers = {}
+  const handle = <T>(
+    channel: string,
+    fn: (event: IpcMainInvokeEvent, ...args: any[]) => Promise<T> | T
+  ): void => {
+    handlers[channel] = fn as ApiHandler
+  }
+
   handle<BootstrapState>(CHANNELS.bootstrap, async () => ({
     accounts: ctx.accounts.list(),
     folders: ctx.folders.list(),
     policy: ctx.policy,
     app: appInfo(),
-    updater: ctx.updater.snapshot()
+    updater: ctx.updater.snapshot(),
+    sync: Array.from(ctx.syncers.values()).map((syncer) => syncer.getStatus())
   }))
 
   // ---------------------------------------------------------------- аккаунты
@@ -341,6 +353,17 @@ export function registerIpc(ctx: AppContext, getWindow: () => BrowserWindow | nu
   handle<void>(CHANNELS.windowClose, () => {
     getWindow()?.close()
   })
+
+  return handlers
+}
+
+export function registerIpc(ctx: AppContext, getWindow: () => BrowserWindow | null): void {
+  for (const [channel, handler] of Object.entries(createApiHandlers(ctx, getWindow))) {
+    ipcMain.handle(channel, async (event, ...args) => {
+      assertTrusted(event)
+      return handler(event, ...args)
+    })
+  }
 }
 
 function flagsToMaskLocal(flags: MessageFlags): number {

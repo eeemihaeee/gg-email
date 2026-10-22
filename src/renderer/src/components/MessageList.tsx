@@ -42,6 +42,12 @@ export default function MessageList(): React.JSX.Element {
         : 'Все входящие'
       : activeFolder?.name ?? 'Папка'
 
+  const sync = useStore((state) => state.sync)
+  const accountError = selection.accountId
+    ? sync[selection.accountId]?.error
+    : Object.values(sync).find((status) => status.error)?.error
+  const accountPhase = selection.accountId ? sync[selection.accountId]?.phase : undefined
+
   return (
     <section className="list-pane">
       <header className="list-header">
@@ -64,16 +70,40 @@ export default function MessageList(): React.JSX.Element {
 
       {messages.length === 0 && !listLoading && (
         <div className="list-empty">
-          <Icon name="inbox" size={38} />
+          <Icon name={accountError ? 'warning' : 'inbox'} size={38} />
           <p>
-            {query
-              ? 'Ничего не найдено'
-              : selection.kind === 'unified'
-                ? 'Входящие пусты'
-                : 'В этой папке нет писем'}
+            {accountError
+              ? 'Не удалось подключиться к почтовому серверу'
+              : query
+                ? 'Ничего не найдено'
+                : selection.kind === 'unified'
+                  ? 'Входящие пусты'
+                  : 'В этой папке нет писем'}
           </p>
-          {!query && selection.kind === 'unified' && (
-            <span className="dim">Новые письма появятся здесь автоматически</span>
+          {accountError ? (
+            <span className="empty-error">{accountError}</span>
+          ) : (
+            !query &&
+            selection.kind === 'unified' && (
+              <span className="dim">Новые письма появятся здесь автоматически</span>
+            )
+          )}
+          {accountError && accountPhase === 'offline' && (
+            <div className="empty-actions">
+              <span className="dim small">Проверьте адрес, порт и пароль приложения</span>
+              <button
+                className="btn compact"
+                onClick={() => {
+                  const accountId = selection.accountId
+                  void window.kurier.sync
+                    .now(accountId)
+                    .then(() => useStore.getState().pushToast('info', 'Повторная попытка подключения…'))
+                    .catch((error: Error) => useStore.getState().pushToast('error', error.message))
+                }}
+              >
+                Повторить
+              </button>
+            </div>
           )}
         </div>
       )}
@@ -94,9 +124,7 @@ export default function MessageList(): React.JSX.Element {
                 }}
                 onClick={() => void openMessage(message.id)}
               >
-                <div className="msg-avatar" style={{ background: message.flags.seen ? '#2a2f37' : '#3a4a63' }}>
-                  {initials(senderLabel(message.from))}
-                </div>
+                <div className="msg-avatar">{initials(senderLabel(message.from))}</div>
                 <div className="msg-main">
                   <div className="msg-line">
                     <span className="msg-sender">{senderLabel(message.from)}</span>

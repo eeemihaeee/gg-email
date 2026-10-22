@@ -77,7 +77,7 @@ async function fetchText(url: string, init?: RequestInit): Promise<string | null
     const response = await fetch(url, {
       ...init,
       signal: AbortSignal.timeout(TIMEOUT_MS),
-      headers: { 'User-Agent': 'Kurier/0.1', ...(init?.headers ?? {}) }
+      headers: { 'User-Agent': 'GG Email/0.1', ...(init?.headers ?? {}) }
     })
     if (!response.ok) return null
     return await response.text()

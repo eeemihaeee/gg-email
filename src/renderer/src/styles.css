@@ -1,67 +1,55 @@
 /* ============================================================
-   Kurier — оформление интерфейса
-   Тёмная тема по умолчанию, светлая — по системной настройке.
+   GG Email — светлый интерфейс в стиле remofood:
+   белые поверхности, мягкие границы, красный акцент.
+   Тёмная тема включается вручную или по системной настройке.
    ============================================================ */
 
 :root {
-  --bg: #0f1115;
-  --bg-elev: #14171c;
-  --bg-elev2: #191d24;
-  --bg-hover: #1e232b;
-  --border: #242931;
-  --border-soft: #1c2128;
-  --text: #e7e9ec;
-  --text-dim: #8d95a0;
-  --text-faint: #5f6772;
-  --accent: #4c8dff;
-  --accent-soft: rgba(76, 141, 255, 0.14);
-  --accent-strong: #2f6fed;
-  --danger: #ff5d5d;
-  --success: #3ddc84;
-  --warning: #f5a623;
-  --star: #f5c451;
-  --radius: 10px;
-  --radius-sm: 7px;
-  --shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
+  --bg: #f5f5f7;
+  --bg-elev: #ffffff;
+  --bg-elev2: #ffffff;
+  --bg-hover: #f5f5f7;
+  --border: #e9e9eb;
+  --border-soft: #efeff1;
+  --text: #171717;
+  --text-dim: #737380;
+  --text-faint: #9a9aa3;
+  --accent: #f23c30;
+  --accent-soft: #fff0ef;
+  --accent-strong: #e33327;
+  --danger: #d9362b;
+  --success: #11a83c;
+  --warning: #b7791f;
+  --star: #f2b01e;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 10px 30px rgba(23, 23, 23, 0.08);
   --row-height: 76px;
   --font: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
   --mono: "Cascadia Mono", Consolas, "Courier New", monospace;
 }
 
-:root[data-theme='light'] {
-  --bg: #f4f6f8;
-  --bg-elev: #ffffff;
-  --bg-elev2: #ffffff;
-  --bg-hover: #eef1f5;
-  --border: #e1e5ea;
-  --border-soft: #eaeef2;
-  --text: #1c2128;
-  --text-dim: #667085;
-  --text-faint: #98a2b3;
-  --accent: #2f6fed;
-  --accent-soft: rgba(47, 111, 237, 0.1);
-  --shadow: 0 18px 48px rgba(16, 24, 40, 0.16);
+:root[data-theme='dark'] {
+  --bg: #101114;
+  --bg-elev: #17181c;
+  --bg-elev2: #1c1e23;
+  --bg-hover: #24262c;
+  --border: #2b2e35;
+  --border-soft: #22252a;
+  --text: #eceef1;
+  --text-dim: #9aa0aa;
+  --text-faint: #6b727c;
+  --accent: #ff5a4d;
+  --accent-soft: rgba(242, 60, 48, 0.16);
+  --accent-strong: #e33327;
+  --danger: #ff6b5e;
+  --warning: #e0a33a;
+  --star: #f2c14e;
+  --shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
 }
 
 :root[data-density='compact'] {
   --row-height: 58px;
-}
-
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme='dark']) {
-    --bg: #f4f6f8;
-    --bg-elev: #ffffff;
-    --bg-elev2: #ffffff;
-    --bg-hover: #eef1f5;
-    --border: #e1e5ea;
-    --border-soft: #eaeef2;
-    --text: #1c2128;
-    --text-dim: #667085;
-    --text-faint: #98a2b3;
-    --accent: #2f6fed;
-    --accent-soft: rgba(47, 111, 237, 0.1);
-    --shadow: 0 18px 48px rgba(16, 24, 40, 0.16);
-  }
 }
 
 * {
@@ -167,6 +155,8 @@ button {
 
 .titlebar {
   -webkit-app-region: drag;
+  background: var(--bg-elev);
+  border-bottom: 1px solid var(--border-soft);
   display: flex;
   align-items: center;
   gap: 16px;
@@ -193,10 +183,11 @@ button {
   width: 24px;
   height: 24px;
   border-radius: 7px;
-  background: linear-gradient(135deg, #4c8dff, #7b5cff);
+  background: linear-gradient(135deg, #f23c30, #ff7a4d);
   color: #fff;
   font-weight: 700;
-  font-size: 13px;
+  font-size: 10.5px;
+  letter-spacing: 0.2px;
 }
 
 .brand-name {
@@ -512,7 +503,7 @@ button {
   display: flex;
   flex-direction: column;
   min-height: 0;
-  background: var(--bg);
+  background: var(--bg-elev);
   border-right: 1px solid var(--border-soft);
 }
 
@@ -577,12 +568,12 @@ button {
 }
 
 .msg-row:hover {
-  background: var(--bg-elev);
+  background: var(--bg);
 }
 
 .msg-row.selected {
   background: var(--accent-soft);
-  box-shadow: inset 2px 0 0 var(--accent);
+  box-shadow: inset 3px 0 0 var(--accent);
 }
 
 .msg-avatar {
@@ -594,7 +585,13 @@ button {
   place-items: center;
   font-size: 12px;
   font-weight: 600;
-  color: #cfd6df;
+  background: #f2f2f4;
+  color: #8a8a93;
+}
+
+.msg-row.unread .msg-avatar {
+  background: #ffe4e1;
+  color: var(--accent-strong);
 }
 
 .msg-main {
@@ -621,7 +618,7 @@ button {
 }
 
 .msg-row.unread .msg-sender {
-  color: #fff;
+  color: var(--text);
 }
 
 .msg-date {
@@ -696,6 +693,21 @@ button {
   color: var(--text-dim);
 }
 
+.empty-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.empty-error {
+  max-width: 320px;
+  color: var(--danger);
+  font-size: 12px;
+  line-height: 1.45;
+  word-break: break-word;
+}
+
 .load-more {
   display: block;
   width: calc(100% - 24px);
@@ -738,7 +750,7 @@ button {
   height: 54px;
   margin: 0 auto 16px;
   border-radius: 16px;
-  background: linear-gradient(135deg, #4c8dff, #7b5cff);
+  background: linear-gradient(135deg, #f23c30, #ff7a4d);
   color: #fff;
   font-size: 24px;
   font-weight: 700;
@@ -1570,7 +1582,7 @@ kbd {
   border-radius: 16px;
   display: grid;
   place-items: center;
-  background: linear-gradient(135deg, #4c8dff, #7b5cff);
+  background: linear-gradient(135deg, #f23c30, #ff7a4d);
   color: #fff;
   font-size: 26px;
   font-weight: 700;

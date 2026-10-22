@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <policyDefinitionResources revision="1.0" schemaVersion="1.0" xmlns="http://schemas.microsoft.com/GroupPolicy/2006/07/PolicyDefinitions">
-  <displayName>Kurier Почта</displayName>
-  <description>Политики корпоративного почтового клиента Kurier</description>
+  <displayName>GG Email Почта</displayName>
+  <description>Политики корпоративного почтового клиента GG Email</description>
   <resources>
     <stringTable>
-      <string id="Kurier">Kurier Почта</string>
-      <string id="Kurier_Accounts">Учётные записи и серверы</string>
-      <string id="Kurier_Updates">Обновления</string>
-      <string id="Kurier_Security">Безопасность и контент</string>
-      <string id="Kurier_Storage">Кеш и хранилище</string>
-      <string id="Kurier_Interface">Интерфейс</string>
-      <string id="Kurier_Diagnostics">Диагностика</string>
+      <string id="GGEmail">GG Email Почта</string>
+      <string id="GGEmail_Accounts">Учётные записи и серверы</string>
+      <string id="GGEmail_Updates">Обновления</string>
+      <string id="GGEmail_Security">Безопасность и контент</string>
+      <string id="GGEmail_Storage">Кеш и хранилище</string>
+      <string id="GGEmail_Interface">Интерфейс</string>
+      <string id="GGEmail_Diagnostics">Диагностика</string>
       <string id="AutoconfigUrl">URL автонастройки во внутренней сети</string>
       <string id="AutoconfigUrl_Help">Базовый URL автонастройки в формате Thunderbird (например https://autoconfig.example.com/mail/config-v1.1.xml?emailaddress=%EMAIL%). Клиент обращается к нему раньше публичных источников.</string>
       <string id="PreconfiguredAccounts">Предустановленные учётные записи (JSON)</string>

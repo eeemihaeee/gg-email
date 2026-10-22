@@ -1,13 +1,13 @@
 <#
 .SYNOPSIS
-    Устанавливает файлы ADMX/ADML Kurier в центральное хранилище политик.
+    Устанавливает файлы ADMX/ADML GG Email в центральное хранилище политик.
 
 .DESCRIPTION
-    Копирует Kurier.admx и локализации в C:\Windows\PolicyDefinitions.
+    Копирует GGEmail.admx и локализации в C:\Windows\PolicyDefinitions.
     Требуются права администратора. После установки политики доступны в
     редакторе групповых политик:
-      Конфигурация компьютера → Административные шаблоны → Kurier Почта
-      Конфигурация пользователя → Административные шаблоны → Kurier Почта
+      Конфигурация компьютера → Административные шаблоны → GG Email Почта
+      Конфигурация пользователя → Административные шаблоны → GG Email Почта
 
 .PARAMETER PolicyStore
     Необязательный путь к папке Policies конкретной GPO
@@ -18,7 +18,7 @@
     Создать резервную копию существующих файлов перед заменой.
 
 .EXAMPLE
-    .\Install-KurierADMX.ps1 -Backup
+    .\Install-GGEmailADMX.ps1 -Backup
 #>
 [CmdletBinding()]
 param(
@@ -28,7 +28,7 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $scriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
-$admxSource = Join-Path $scriptRoot 'Kurier.admx'
+$admxSource = Join-Path $scriptRoot 'GGEmail.admx'
 
 if (-not (Test-Path $admxSource)) {
     throw "Не найден $admxSource. Соберите файлы командой: npm run admx"
@@ -46,9 +46,9 @@ if (-not $PolicyStore) {
 }
 
 $targets = @(
-    @{ Source = (Join-Path $scriptRoot 'Kurier.admx'); Destination = (Join-Path $PolicyStore 'Kurier.admx') },
-    @{ Source = (Join-Path $scriptRoot 'ru-RU\Kurier.adml'); Destination = (Join-Path $PolicyStore 'ru-RU\Kurier.adml') },
-    @{ Source = (Join-Path $scriptRoot 'en-US\Kurier.adml'); Destination = (Join-Path $PolicyStore 'en-US\Kurier.adml') }
+    @{ Source = (Join-Path $scriptRoot 'GGEmail.admx'); Destination = (Join-Path $PolicyStore 'GGEmail.admx') },
+    @{ Source = (Join-Path $scriptRoot 'ru-RU\GGEmail.adml'); Destination = (Join-Path $PolicyStore 'ru-RU\GGEmail.adml') },
+    @{ Source = (Join-Path $scriptRoot 'en-US\GGEmail.adml'); Destination = (Join-Path $PolicyStore 'en-US\GGEmail.adml') }
 )
 
 foreach ($target in $targets) {
@@ -68,4 +68,4 @@ foreach ($target in $targets) {
 
 Write-Host ''
 Write-Host 'Готово. Откройте gpedit.msc или консоль управления групповыми политиками.'
-Write-Host 'Раздел: Административные шаблоны → Kurier Почта.'
+Write-Host 'Раздел: Административные шаблоны → GG Email Почта.'

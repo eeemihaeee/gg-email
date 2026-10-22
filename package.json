@@ -1,10 +1,10 @@
 {
-  "name": "kurier",
-  "productName": "Kurier",
-  "version": "0.1.0",
-  "description": "Kurier — корпоративный почтовый клиент для Windows",
+  "name": "gg-email",
+  "productName": "GG Email",
+  "version": "0.2.0",
+  "description": "GG Email — почтовый клиент для Windows и браузера",
   "author": {
-    "name": "Kurier Team",
+    "name": "GG Email Team",
     "email": "it@example.com"
   },
   "license": "UNLICENSED",
@@ -16,6 +16,9 @@
   "scripts": {
     "dev": "electron-vite dev",
     "build": "electron-vite build",
+    "build:web": "vite build --config vite.web.config.ts",
+    "web": "npm run build && npm run build:web && node out/web/server.cjs",
+    "web:serve": "node out/web/server.cjs",
     "start": "electron-vite preview",
     "typecheck": "tsc -p tsconfig.node.json --noEmit && tsc -p tsconfig.web.json --noEmit",
     "test": "vitest run",

@@ -7,11 +7,11 @@ import { fileURLToPath } from 'node:url'
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const catalog = JSON.parse(readFileSync(join(root, 'src/shared/policy-catalog.json'), 'utf8'))
 
-const RUN_INSTALL = String.raw`.\Install-KurierADMX.ps1 -Backup`
+const RUN_INSTALL = String.raw`.\Install-GGEmailADMX.ps1 -Backup`
 const UNC_PATH = String.raw`\\domain\sysvol\domain\Policies\PolicyDefinitions`
 const RUN_TEST = String.raw`.\Test-Policy.ps1`
-const HKLM_KEY = String.raw`HKLM\SOFTWARE\Policies\Kurier`
-const HKCU_KEY = String.raw`HKCU\SOFTWARE\Policies\Kurier`
+const HKLM_KEY = String.raw`HKLM\SOFTWARE\Policies\GG Email`
+const HKCU_KEY = String.raw`HKCU\SOFTWARE\Policies\GG Email`
 
 const escapeXml = (value) =>
   String(value)
@@ -92,7 +92,7 @@ function buildAdmx() {
   return `<?xml version="1.0" encoding="utf-8"?>
 <policyDefinitions revision="1.0" schemaVersion="1.0" xmlns="http://schemas.microsoft.com/GroupPolicy/2006/07/PolicyDefinitions">
   <policyNamespaces>
-    <target prefix="kurier" namespace="Kurier.Mail" />
+    <target prefix="ggemail" namespace="GGEmail.Mail" />
     <using prefix="windows" namespace="Microsoft.Policies.Windows" />
   </policyNamespaces>
   <resources minRequiredRevision="1.0" />
@@ -167,8 +167,8 @@ function buildAdml(lang) {
 
   return `<?xml version="1.0" encoding="utf-8"?>
 <policyDefinitionResources revision="1.0" schemaVersion="1.0" xmlns="http://schemas.microsoft.com/GroupPolicy/2006/07/PolicyDefinitions">
-  <displayName>${lang === 'ru' ? 'Kurier Почта' : 'Kurier Mail'}</displayName>
-  <description>${lang === 'ru' ? 'Политики корпоративного почтового клиента Kurier' : 'Kurier corporate mail client policies'}</description>
+  <displayName>${lang === 'ru' ? 'GG Email Почта' : 'GG Email Mail'}</displayName>
+  <description>${lang === 'ru' ? 'Политики корпоративного почтового клиента GG Email' : 'GG Email corporate mail client policies'}</description>
   <resources>
     <stringTable>
 ${strings.join('\n')}
@@ -195,7 +195,7 @@ function buildReadme() {
     )
     .join('\n')
 
-  return `# Политики Kurier (ADMX/ADML)
+  return `# Политики GG Email (ADMX/ADML)
 
 Файлы в этом каталоге генерируются из \`src/shared/policy-catalog.json\`:
 
@@ -213,7 +213,7 @@ ${RUN_INSTALL}
 ${UNC_PATH}
 \`\`\`
 
-После установки откройте \`gpedit.msc\` → Административные шаблоны → **Kurier Почта**.
+После установки откройте \`gpedit.msc\` → Административные шаблоны → **GG Email Почта**.
 В домене используется \`gpmc.msc\`; шаблоны подхватываются из Central Store.
 
 ## Ветки реестра
@@ -258,13 +258,13 @@ const outDir = join(root, 'policy')
 mkdirSync(join(outDir, 'ru-RU'), { recursive: true })
 mkdirSync(join(outDir, 'en-US'), { recursive: true })
 
-writeFileSync(join(outDir, 'Kurier.admx'), buildAdmx(), 'utf8')
-writeFileSync(join(outDir, 'ru-RU', 'Kurier.adml'), buildAdml('ru'), 'utf8')
-writeFileSync(join(outDir, 'en-US', 'Kurier.adml'), buildAdml('en'), 'utf8')
+writeFileSync(join(outDir, 'GGEmail.admx'), buildAdmx(), 'utf8')
+writeFileSync(join(outDir, 'ru-RU', 'GGEmail.adml'), buildAdml('ru'), 'utf8')
+writeFileSync(join(outDir, 'en-US', 'GGEmail.adml'), buildAdml('en'), 'utf8')
 writeFileSync(join(outDir, 'README.md'), buildReadme(), 'utf8')
 
 console.log(`ADMX: ${catalog.policies.length} политик, ${catalog.categories.length} категорий`)
-console.log('  policy/Kurier.admx')
-console.log('  policy/ru-RU/Kurier.adml')
-console.log('  policy/en-US/Kurier.adml')
+console.log('  policy/GGEmail.admx')
+console.log('  policy/ru-RU/GGEmail.adml')
+console.log('  policy/en-US/GGEmail.adml')
 console.log('  policy/README.md')

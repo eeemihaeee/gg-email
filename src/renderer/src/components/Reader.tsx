@@ -53,10 +53,10 @@ export default function Reader(): React.JSX.Element | null {
     return (
       <section className="reader-pane empty">
         <div className="reader-placeholder">
-          <div className="placeholder-logo">K</div>
+          <div className="placeholder-logo">GG</div>
           <h3>Выберите письмо</h3>
           <p className="dim">
-            Kurier хранит заголовки всех писем локально, поэтому список открывается мгновенно
+            GG Email хранит заголовки всех писем локально, поэтому список открывается мгновенно
             даже без сети.
           </p>
           <div className="shortcut-grid">

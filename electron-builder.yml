@@ -1,6 +1,6 @@
-appId: com.kurier.mail
-productName: Kurier
-copyright: © Kurier Team
+appId: com.gg.email
+productName: GG Email
+copyright: © GG Email Team
 directories:
   buildResources: build
   output: release
@@ -19,10 +19,10 @@ win:
       arch:
         - x64
   icon: build/icon.ico
-  artifactName: Kurier-Setup-${version}.${ext}
+  artifactName: GG-Email-Setup-${version}.${ext}
   # Установка и обновления не требуют прав администратора.
   requestedExecutionLevel: asInvoker
-  legalTrademarks: Kurier
+  legalTrademarks: GG Email
 
 nsis:
   oneClick: false
@@ -31,8 +31,8 @@ nsis:
   allowToChangeInstallationDirectory: false
   createDesktopShortcut: true
   createStartMenuShortcut: true
-  shortcutName: Kurier
-  uninstallDisplayName: Kurier Mail
+  shortcutName: GG Email
+  uninstallDisplayName: GG Email
   deleteAppDataOnUninstall: false
   differentialPackage: true
   include: build/installer.nsh

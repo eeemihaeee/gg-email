@@ -1,17 +1,17 @@
 <#
 .SYNOPSIS
-    Создаёт GPO с рекомендованными настройками Kurier.
+    Создаёт GPO с рекомендованными настройками GG Email.
 
 .DESCRIPTION
     Требуется модуль GroupPolicy (RSAT) и права на создание GPO в домене.
-    Политики записываются в HKLM\SOFTWARE\Policies\Kurier.
+    Политики записываются в HKLM\SOFTWARE\Policies\GG Email.
 
 .EXAMPLE
-    .\New-KurierGPO.ps1 -Name 'Kurier Mail' -AutoconfigUrl 'https://autoconfig.company.ru/mail/config-v1.1.xml?emailaddress=%EMAIL%'
+    .\New-GGEmailGPO.ps1 -Name 'GG Email Mail' -AutoconfigUrl 'https://autoconfig.company.ru/mail/config-v1.1.xml?emailaddress=%EMAIL%'
 #>
 [CmdletBinding()]
 param(
-    [string]$Name = 'Kurier Mail',
+    [string]$Name = 'GG Email Mail',
     [string]$AutoconfigUrl = '',
     [ValidateSet('auto', 'notify', 'disabled')]
     [string]$UpdateMode = 'auto',
@@ -31,11 +31,11 @@ if ($existing) {
     Write-Host "GPO «$Name» уже существует — обновляю настройки."
     $gpo = $existing
 } else {
-    $gpo = New-GPO -Name $Name -Comment 'Политики почтового клиента Kurier'
+    $gpo = New-GPO -Name $Name -Comment 'Политики почтового клиента GG Email'
     Write-Host "Создана GPO «$Name» ($($gpo.Id))."
 }
 
-$key = 'SOFTWARE\Policies\Kurier'
+$key = 'SOFTWARE\Policies\GG Email'
 
 function Set-PolicyValue {
     param([string]$ValueName, $Value, [string]$Type = 'String')
@@ -63,4 +63,4 @@ if ($DisableAccountManagement) {
 Write-Host ''
 Write-Host "GPO готова. Привяжите её к подразделению:"
 Write-Host "  New-GPLink -Name '$Name' -Target 'OU=Users,DC=company,DC=ru'"
-Write-Host 'Не забудьте установить ADMX: .\Install-KurierADMX.ps1'
+Write-Host 'Не забудьте установить ADMX: .\Install-GGEmailADMX.ps1'

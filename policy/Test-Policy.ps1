@@ -1,9 +1,9 @@
 <#
 .SYNOPSIS
-    Тестирует применение политик Kurier без домена.
+    Тестирует применение политик GG Email без домена.
 
 .DESCRIPTION
-    Записывает значения в HKCU\SOFTWARE\Policies\Kurier (пользовательская ветка),
+    Записывает значения в HKCU\SOFTWARE\Policies\GG Email (пользовательская ветка),
     запускает клиент и показывает, что он видит. Для проверки машинных политик
     используйте -Scope Machine (нужны права администратора).
 
@@ -22,7 +22,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-$root = if ($Scope -eq 'Machine') { 'HKLM:\SOFTWARE\Policies\Kurier' } else { 'HKCU:\SOFTWARE\Policies\Kurier' }
+$root = if ($Scope -eq 'Machine') { 'HKLM:\SOFTWARE\Policies\GG Email' } else { 'HKCU:\SOFTWARE\Policies\GG Email' }
 
 if ($Remove) {
     Remove-Item $root -Recurse -Force -ErrorAction SilentlyContinue
@@ -43,5 +43,5 @@ New-ItemProperty -Path $root -Name 'AutoconfigUrl' -Value 'https://autoconfig.co
 
 Write-Host "Записаны тестовые политики в $root:"
 Get-ItemProperty $root | Format-List
-Write-Host 'Запустите Kurier: в настройках, раздел «Политики», должны отобразиться применённые значения.'
+Write-Host 'Запустите GG Email: в настройках, раздел «Политики», должны отобразиться применённые значения.'
 Write-Host "Удалить: .\Test-Policy.ps1 -Remove"

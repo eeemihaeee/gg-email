@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <policyDefinitionResources revision="1.0" schemaVersion="1.0" xmlns="http://schemas.microsoft.com/GroupPolicy/2006/07/PolicyDefinitions">
-  <displayName>Kurier Mail</displayName>
-  <description>Kurier corporate mail client policies</description>
+  <displayName>GG Email Mail</displayName>
+  <description>GG Email corporate mail client policies</description>
   <resources>
     <stringTable>
-      <string id="Kurier">Kurier Mail</string>
-      <string id="Kurier_Accounts">Accounts and servers</string>
-      <string id="Kurier_Updates">Updates</string>
-      <string id="Kurier_Security">Security and content</string>
-      <string id="Kurier_Storage">Cache and storage</string>
-      <string id="Kurier_Interface">Interface</string>
-      <string id="Kurier_Diagnostics">Diagnostics</string>
+      <string id="GGEmail">GG Email Mail</string>
+      <string id="GGEmail_Accounts">Accounts and servers</string>
+      <string id="GGEmail_Updates">Updates</string>
+      <string id="GGEmail_Security">Security and content</string>
+      <string id="GGEmail_Storage">Cache and storage</string>
+      <string id="GGEmail_Interface">Interface</string>
+      <string id="GGEmail_Diagnostics">Diagnostics</string>
       <string id="AutoconfigUrl">Intranet autoconfiguration URL</string>
       <string id="AutoconfigUrl_Help">Base URL of Thunderbird-style autoconfig XML (for example https://autoconfig.example.com/mail/config-v1.1.xml?emailaddress=%EMAIL%). The client queries it before public sources.</string>
       <string id="PreconfiguredAccounts">Preconfigured accounts (JSON)</string>

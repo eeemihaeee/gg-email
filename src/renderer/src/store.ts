@@ -181,6 +181,7 @@ export const useStore = create<Store>()((set, get) => ({
         appInfo: state.app,
         updater: state.updater,
         settings,
+        sync: Object.fromEntries(state.sync.map((status) => [status.accountId, status])),
         view: hasAccounts ? 'mail' : 'setup',
         selection: firstAccount
           ? { kind: 'unified', accountId: firstAccount.id }
@@ -574,7 +575,12 @@ export const useStore = create<Store>()((set, get) => ({
 export function applyTheme(settings: UserSettings | null): void {
   if (!settings) return
   const root = document.documentElement
-  root.dataset.theme = settings.theme
+  const systemDark =
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-color-scheme: dark)').matches
+  const theme =
+    settings.theme === 'system' ? (systemDark ? 'dark' : 'light') : settings.theme
+  root.dataset.theme = theme
   root.dataset.density = settings.density
 }
 

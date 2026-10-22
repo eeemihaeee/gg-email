@@ -9,7 +9,7 @@ export function configureLogger(level: LogLevel, logDir?: string): void {
   currentLevel = LEVELS.includes(level) ? level : 'warn'
   log.transports.file.level = currentLevel
   log.transports.console.level = currentLevel
-  if (logDir) log.transports.file.resolvePathFn = () => `${logDir}/kurier.log`
+  if (logDir) log.transports.file.resolvePathFn = () => `${logDir}/gg-email.log`
   log.transports.file.maxSize = 5 * 1024 * 1024
   log.errorHandler.startCatching({ showDialog: false })
 }

@@ -1,6 +1,6 @@
 # Руководство администратора
 
-Документ описывает развёртывание Kurier в домене Windows, настройку почтовых
+Документ описывает развёртывание GG Email в домене Windows, настройку почтовых
 серверов, групповых политик, обновлений и диагностику.
 
 ## 1. Требования
@@ -9,7 +9,7 @@
 |---|---|
 | ОС | Windows 10 1903+ / Windows 11, x64 |
 | Права пользователя | обычные (установка per-user, без UAC) |
-| Память | от 4 ГБ на рабочей станции; Kurier занимает ~150–250 МБ |
+| Память | от 4 ГБ на рабочей станции; GG Email занимает ~150–250 МБ |
 | Диск | ~400 МБ на установку + кеш (лимитируется политикой) |
 | Сеть | IMAP 993/143 (STARTTLS), SMTP 465/587; HTTPS для обновлений и автонастройки |
 | Домен | не обязателен: ADMX работает и в локальной политике |
@@ -19,12 +19,12 @@
 ## 2. Состав поставки
 
 ```
-Kurier-Setup-0.1.0.exe      установщик NSIS (per-user)
-policy/Kurier.admx          шаблон политик
-policy/ru-RU/Kurier.adml    локализация
-policy/en-US/Kurier.adml
-policy/Install-KurierADMX.ps1
-policy/New-KurierGPO.ps1
+GG-Email-Setup-0.1.0.exe      установщик NSIS (per-user)
+policy/GGEmail.admx          шаблон политик
+policy/ru-RU/GGEmail.adml    локализация
+policy/en-US/GGEmail.adml
+policy/Install-GGEmailADMX.ps1
+policy/New-GGEmailGPO.ps1
 policy/Test-Policy.ps1
 policy/README.md            справочник политик
 ```
@@ -33,13 +33,13 @@ policy/README.md            справочник политик
 
 ### 3.1 Вручную
 
-Запустить `Kurier-Setup-0.1.0.exe`, выбрать «Только для меня» (по умолчанию).
-Установка идёт в `%LOCALAPPDATA%\Programs\Kurier`, права администратора не нужны.
+Запустить `GG-Email-Setup-0.1.0.exe`, выбрать «Только для меня» (по умолчанию).
+Установка идёт в `%LOCALAPPDATA%\Programs\GG Email`, права администратора не нужны.
 
 ### 3.2 Тихая установка
 
 ```powershell
-Kurier-Setup-0.1.0.exe /S
+GG-Email-Setup-0.1.0.exe /S
 ```
 
 Код возврата 0 — успех. Ярлыки создаются в профиле пользователя.
@@ -47,10 +47,10 @@ Kurier-Setup-0.1.0.exe /S
 ### 3.3 SCCM / Intune
 
 - Тип развёртывания: **Application**, установка от имени пользователя (`Install behavior: User`).
-- Команда: `Kurier-Setup-0.1.0.exe /S`.
-- Detection: файл `%LOCALAPPDATA%\Programs\Kurier\Kurier.exe` существует, версия из
-  `%LOCALAPPDATA%\Programs\Kurier\resources\app-update.yml` или из реестра
-  `HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall\*` (DisplayName = Kurier Mail).
+- Команда: `GG-Email-Setup-0.1.0.exe /S`.
+- Detection: файл `%LOCALAPPDATA%\Programs\GG Email\GG Email.exe` существует, версия из
+  `%LOCALAPPDATA%\Programs\GG Email\resources\app-update.yml` или из реестра
+  `HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall\*` (DisplayName = GG Email Mail).
 - Обновления можно не публиковать через SCCM: клиент обновляется сам по политике.
 
 ### 3.4 Терминальные серверы (RDS)
@@ -59,6 +59,24 @@ Kurier-Setup-0.1.0.exe /S
 настроек не требуется. Для экономии диска ограничьте `MaxCacheSizeMb` (например, 1024)
 и `CacheRetentionDays` (90).
 
+### 3.5 Веб-режим (без установки)
+
+Для пилота, тонких клиентов или быстрой проверки ящика можно запустить клиент в браузере:
+
+```powershell
+npm run web
+# в консоли появится ссылка вида http://127.0.0.1:4173/?token=...
+```
+
+- Сервер слушает только `127.0.0.1`; доступ с других машин — через `GGEMAIL_HOST=0.0.0.0`
+  (тогда обязательно закройте порт файрволом и используйте HTTPS-прокси).
+- Токен в ссылке — это доступ к почте; не публикуйте его.
+- Данные лежат в `%APPDATA%\GG Email`, пароли шифруются ключом профиля (AES-256-GCM).
+- Политики читаются из того же реестра, что и у desktop-версии.
+- Автообновления в веб-режиме нет: обновляется серверный бандл (`npm run build:web`).
+
+Веб-режим удобен для проверки настроек mailcow до массовой установки: добавьте ящик,
+убедитесь, что папки и письма видны, затем разворачивайте установщик.
 ## 4. Подключение mailcow
 
 ### 4.1 Автонастройка (рекомендуется)
@@ -72,7 +90,7 @@ https://mail.company.ru/autoconfig/mail/config-v1.1.xml?emailaddress=%EMAIL%
 Задайте политику `AutoconfigUrl` — клиент обратится к ней раньше публичных источников:
 
 ```powershell
-Set-GPRegistryValue -Name 'Kurier Mail' -Key 'SOFTWARE\Policies\Kurier' `
+Set-GPRegistryValue -Name 'GG Email Mail' -Key 'SOFTWARE\Policies\GG Email' `
   -ValueName 'AutoconfigUrl' -Type String `
   -Value 'https://mail.company.ru/autoconfig/mail/config-v1.1.xml?emailaddress=%EMAIL%'
 ```
@@ -129,27 +147,27 @@ Set-GPRegistryValue -Name 'Kurier Mail' -Key 'SOFTWARE\Policies\Kurier' `
 
 ```powershell
 # на рабочей станции (администратор)
-.\policy\Install-KurierADMX.ps1 -Backup
+.\policy\Install-GGEmailADMX.ps1 -Backup
 
 # в домене — Central Store
-copy policy\Kurier.admx  \\domain\sysvol\domain\Policies\PolicyDefinitions\
-copy policy\ru-RU\Kurier.adml \\domain\sysvol\domain\Policies\PolicyDefinitions\ru-RU\
-copy policy\en-US\Kurier.adml \\domain\sysvol\domain\Policies\PolicyDefinitions\en-US\
+copy policy\GGEmail.admx  \\domain\sysvol\domain\Policies\PolicyDefinitions\
+copy policy\ru-RU\GGEmail.adml \\domain\sysvol\domain\Policies\PolicyDefinitions\ru-RU\
+copy policy\en-US\GGEmail.adml \\domain\sysvol\domain\Policies\PolicyDefinitions\en-US\
 ```
 
 После этого политики видны в `gpedit.msc` / `gpmc.msc`:
-**Конфигурация компьютера (и пользователя) → Административные шаблоны → Kurier Почта**.
+**Конфигурация компьютера (и пользователя) → Административные шаблоны → GG Email Почта**.
 
 ### 6.2 Создание GPO
 
 ```powershell
-.\policy\New-KurierGPO.ps1 `
-  -Name 'Kurier Mail' `
+.\policy\New-GGEmailGPO.ps1 `
+  -Name 'GG Email Mail' `
   -AutoconfigUrl 'https://mail.company.ru/autoconfig/mail/config-v1.1.xml?emailaddress=%EMAIL%' `
   -UpdateMode auto `
   -UpdateChannel stable
 
-New-GPLink -Name 'Kurier Mail' -Target 'OU=Workstations,DC=company,DC=ru'
+New-GPLink -Name 'GG Email Mail' -Target 'OU=Workstations,DC=company,DC=ru'
 ```
 
 Скрипт задаёт базовый набор: обновления, блокировку внешнего контента, TLS,
@@ -159,8 +177,8 @@ New-GPLink -Name 'Kurier Mail' -Target 'OU=Workstations,DC=company,DC=ru'
 
 | Источник | Расположение | Приоритет |
 |---|---|---|
-| Машинная политика | `HKLM\SOFTWARE\Policies\Kurier` | высший |
-| Пользовательская политика | `HKCU\SOFTWARE\Policies\Kurier` | ниже |
+| Машинная политика | `HKLM\SOFTWARE\Policies\GG Email` | высший |
+| Пользовательская политика | `HKCU\SOFTWARE\Policies\GG Email` | ниже |
 | Локальные настройки пользователя | SQLite `settings` | ниже политик |
 | Значения по умолчанию | каталог политик | низший |
 
@@ -171,7 +189,7 @@ New-GPLink -Name 'Kurier Mail' -Target 'OU=Workstations,DC=company,DC=ru'
 
 ```powershell
 .\policy\Test-Policy.ps1          # записать тестовые значения в HKCU
-# запустить Kurier → Настройки → Политики
+# запустить GG Email → Настройки → Политики
 .\policy\Test-Policy.ps1 -Remove  # убрать
 ```
 
@@ -198,8 +216,8 @@ New-GPLink -Name 'Kurier Mail' -Target 'OU=Workstations,DC=company,DC=ru'
 ### 7.1 Схема
 
 ```
-Kurier-Setup-0.1.0.exe ──┐
-Kurier-Setup-0.1.0.exe.blockmap ──> HTTPS-каталог ──> electron-updater
+GG-Email-Setup-0.1.0.exe ──┐
+GG-Email-Setup-0.1.0.exe.blockmap ──> HTTPS-каталог ──> electron-updater
 latest.yml ───────────────┘
 ```
 
@@ -211,8 +229,8 @@ latest.yml ───────────────┘
 ```powershell
 npm run dist
 # выложить на сервер обновлений:
-#   release/Kurier-Setup-<ver>.exe
-#   release/Kurier-Setup-<ver>.exe.blockmap
+#   release/GG-Email-Setup-<ver>.exe
+#   release/GG-Email-Setup-<ver>.exe.blockmap
 #   release/latest.yml
 ```
 
@@ -233,7 +251,7 @@ electron-updater не выполняет — это осознанное огр�
 
 ## 8. Безопасность
 
-- Пароли и токены — в `%APPDATA%\Kurier\secrets.bin`, шифруются DPAPI текущего
+- Пароли и токены — в `%APPDATA%\GG Email\secrets.bin`, шифруются DPAPI текущего
   пользователя. Резервное копирование файла бессмысленно на другой машине.
 - TLS обязателен при `RequireTls = 1`; самоподписанные сертификаты не принимаются.
 - HTML отображается в sandboxed iframe с CSP, скрипты и фреймы запрещены.
@@ -245,9 +263,9 @@ electron-updater не выполняет — это осознанное огр�
 
 | Что | Где |
 |---|---|
-| Логи | `%APPDATA%\Kurier\logs\kurier.log` (уровень — политика `LogLevel`) |
-| База | `%APPDATA%\Kurier\kurier.db` (SQLite; можно открыть DB Browser) |
-| Вложения | `%APPDATA%\Kurier\attachments\` |
+| Логи | `%APPDATA%\GG Email\logs\kurier.log` (уровень — политика `LogLevel`) |
+| База | `%APPDATA%\GG Email\gg-email.db` (SQLite; можно открыть DB Browser) |
+| Вложения | `%APPDATA%\GG Email\attachments\` |
 | Версия/компоненты | Настройки → О программе |
 | Политики | Настройки → Политики |
 | Сброс кеша | Настройки → О программе → Очистить кеш |
@@ -267,12 +285,12 @@ electron-updater не выполняет — это осознанное огр�
 
 Автоматического импорта профиля Thunderbird в MVP нет.
 
-1. Установите Kurier рядом с Thunderbird.
+1. Установите GG Email рядом с Thunderbird.
 2. Добавьте ящики (при настроенной автонастройке — только адрес и пароль).
 3. Дождитесь синхронизации заголовков; тела загружаются по мере открытия.
 4. Локальные папки Thunderbird (`Local Folders`) не переносятся — при необходимости
    загрузите их на сервер через IMAP до миграции.
-5. Адресную книгу можно экспортировать в LDIF/CSV, но импорт в Kurier пока не реализован.
+5. Адресную книгу можно экспортировать в LDIF/CSV, но импорт в GG Email пока не реализован.
 
 ## 11. Чек-лист внедрения
 

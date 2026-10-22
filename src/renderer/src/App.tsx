@@ -99,7 +99,7 @@ export default function App(): React.JSX.Element {
   if (initError) {
     return (
       <div className="fatal">
-        <h1>Kurier не смог запуститься</h1>
+        <h1>GG Email не смог запуститься</h1>
         <p>{initError}</p>
         <button className="btn primary" onClick={() => window.location.reload()}>
           Повторить
@@ -124,7 +124,7 @@ export default function App(): React.JSX.Element {
       {!ready && (
         <div className="boot-splash">
           <div className="boot-logo">K</div>
-          <div className="boot-text">Запуск Kurier…</div>
+          <div className="boot-text">Запуск GG Email…</div>
         </div>
       )}
     </div>

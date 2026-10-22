@@ -4,13 +4,13 @@ import { join } from 'node:path'
 import { vi } from 'vitest'
 
 const dataDir = mkdtempSync(join(tmpdir(), 'kurier-test-'))
-process.env.KURIER_USER_DATA = dataDir
+process.env.GGEMAIL_USER_DATA = dataDir
 
 // Минимальная замена Electron API, чтобы main-модули можно было тестировать в Node.
 vi.mock('electron', () => ({
   app: {
     getPath: () => dataDir,
-    getName: () => 'Kurier',
+    getName: () => 'GG Email',
     getVersion: () => '0.0.0-test',
     isPackaged: false,
     setPath: () => undefined

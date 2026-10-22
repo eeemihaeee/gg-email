@@ -137,7 +137,7 @@ function normalizeKeys(raw: Record<string, unknown>): Record<string, unknown> {
 }
 
 export async function loadPolicy(): Promise<PolicyState> {
-  const fileOverride = process.env.KURIER_POLICY_FILE
+  const fileOverride = process.env.GGEMAIL_POLICY_FILE
   if (fileOverride && existsSync(fileOverride)) {
     const { values, source } = readFileSource(fileOverride)
     return buildPolicyState(normalizeKeys(values), source)

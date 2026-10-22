@@ -4,10 +4,13 @@ import App from './App'
 import './styles.css'
 import { applyTheme, useStore } from './store'
 import { installDemoApi } from './demo/mock'
+import { installWebApi, type WebBoot } from './web-client'
 
 const params = new URLSearchParams(window.location.search)
-const demo = params.has('demo') && !('kurier' in window)
-if (demo) installDemoApi()
+const webBoot = (window as unknown as { __GG_WEB__?: WebBoot }).__GG_WEB__
+const demo = !webBoot && params.has('demo') && !('kurier' in window)
+if (webBoot) installWebApi(webBoot)
+else if (demo) installDemoApi()
 
 const rootElement = document.getElementById('root')
 if (!rootElement) throw new Error('Не найден корневой элемент')

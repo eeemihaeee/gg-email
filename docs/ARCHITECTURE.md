@@ -1,4 +1,4 @@
-# Архитектура Kurier
+# Архитектура GG Email
 
 ## 1. Цели и ограничения
 
@@ -8,7 +8,7 @@
 | Умеренное потребление ресурсов | один процесс Electron, виртуализированный список, тела писем по требованию, сжатие, лимиты кеша |
 | Много аккаунтов без путаницы | отдельные папки/цвета, «Все входящие», независимые синхронизаторы |
 | Обновления без прав администратора | NSIS per-user + `electron-updater` (дифференциальные загрузки) |
-| Управление через GPO | ADMX/ADML, чтение `HKLM`/`HKCU\SOFTWARE\Policies\Kurier`, горячее применение |
+| Управление через GPO | ADMX/ADML, чтение `HKLM`/`HKCU\SOFTWARE\Policies\GG Email`, горячее применение |
 | Gmail/Яндекс/mailcow | пресеты, autoconfig, OAuth2 (PKCE) и пароли приложений |
 
 ## 2. Компоненты
@@ -34,7 +34,7 @@
                 │ события: sync-status, messages-changed, policy-changed
 ┌───────────────┴────────────────────────────────────────────────────┐
 │ SQLite (WAL): accounts, folders, messages, attachments, outbox…    │
-│ Файлы вложений: %APPDATA%\Kurier\attachments\<messageId>\           │
+│ Файлы вложений: %APPDATA%\GG Email\attachments\<messageId>\           │
 └────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -50,6 +50,23 @@
 | `src/main/policy.ts` | чтение реестра (`reg.exe`), нормализация, наблюдатель |
 | `src/shared/policy-catalog.json` | единственный источник правды для политик и ADMX |
 
+## 2.1 Веб-режим
+
+Тот же main-код работает и в браузере: `npm run web` собирает `out/web/server.cjs`,
+который поднимает HTTP-сервер на `127.0.0.1:4173`.
+
+- Обработчики API вынесены в `createApiHandlers()` и не зависят от транспорта:
+  Electron регистрирует их через `ipcMain`, веб-сервер — через `POST /api/call`.
+- События (`sync-status`, `messages-changed`, …) идут в браузер через SSE `/api/events`.
+- Вместо Electron API подключается шим `src/web/electron-shim.ts`: пути, `shell`,
+  `safeStorage` (AES-256-GCM вместо DPAPI), заглушки окна и диалогов.
+- Доступ защищён токеном: сервер печатает ссылку `/?token=…`, токен проверяется для
+  API и вложений, страница отдаётся только с валидным токеном или cookie.
+- Boot-конфигурация вынесена в `/api/boot.js`, потому что CSP запрещает inline-скрипты.
+
+Ограничения веб-режима: один профиль на пользователя, нет автообновления и
+системных диалогов сохранения (вложения скачиваются браузером), сервер слушает
+только localhost, если явно не задан `GGEMAIL_HOST`.
 ## 3. Модель данных
 
 ```
@@ -175,11 +192,11 @@ STATUS (MESSAGES, UNSEEN) → счётчики папки
 
 ```
 policy-catalog.json ──┬──> policy.ts (типы, значения по умолчанию, нормализация)
-                      ├──> tools/gen-admx.mjs ──> Kurier.admx + adml (ru/en) + README
+                      ├──> tools/gen-admx.mjs ──> GGEmail.admx + adml (ru/en) + README
                       └──> UI (форматирование значений, блокировки)
 ```
 
-- Чтение: `reg query HKLM\...\Kurier /s` и `HKCU\...`, декодирование OEM-кодировки,
+- Чтение: `reg query HKLM\...\GG Email /s` и `HKCU\...`, декодирование OEM-кодировки,
   `REG_DWORD/QWORD/SZ/EXPAND_SZ/MULTI_SZ`.
 - Приоритет: машинная политика > пользовательская > локальные настройки > значения
   по умолчанию.
@@ -187,12 +204,12 @@ policy-catalog.json ──┬──> policy.ts (типы, значения по 
   диагностику; клиент продолжает работать.
 - Наблюдатель опрашивает реестр каждые 2 минуты (GPO применяется при входе и по
   расписанию), изменения применяются без перезапуска.
-- Для тестов поддерживается `KURIER_POLICY_FILE` — JSON-файл вместо реестра.
+- Для тестов поддерживается `GGEMAIL_POLICY_FILE` — JSON-файл вместо реестра.
 
 ## 8. Обновления
 
 - Установщик NSIS: `perMachine: false`, `requestedExecutionLevel: asInvoker`,
-  каталог `%LOCALAPPDATA%\Programs\Kurier`. Тихая установка — `/S`.
+  каталог `%LOCALAPPDATA%\Programs\GG Email`. Тихая установка — `/S`.
 - `electron-updater` с generic-провайдером: `latest.yml` + `*.blockmap`, поэтому
   скачивается только разница между версиями.
 - Политики: режим (`auto/notify/disabled`), канал (`stable/beta/internal`), интервал
@@ -209,7 +226,7 @@ policy-catalog.json ──┬──> policy.ts (типы, значения по 
 | Смена UIDVALIDITY | автоматический сброс папки |
 | Ошибка SMTP | письмо в `outbox`, ошибка в тосте |
 | Некорректная политика | значение игнорируется, остальное применяется |
-| Падение при старте | логи `%APPDATA%\Kurier\logs\kurier.log`, понятный экран ошибки |
+| Падение при старте | логи `%APPDATA%\GG Email\logs\kurier.log`, понятный экран ошибки |
 
 ## 10. Ограничения и развитие
 

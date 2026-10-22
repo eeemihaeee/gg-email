@@ -4,10 +4,10 @@ import { app } from 'electron'
 
 let cachedRoot: string | null = null
 
-/** Корень пользовательских данных. Переопределяется KURIER_USER_DATA для тестов. */
+/** Корень пользовательских данных. Переопределяется GGEMAIL_USER_DATA для тестов. */
 export function dataRoot(): string {
   if (cachedRoot) return cachedRoot
-  const override = process.env.KURIER_USER_DATA
+  const override = process.env.GGEMAIL_USER_DATA
   cachedRoot = override ? override : app.getPath('userData')
   ensureDir(cachedRoot)
   return cachedRoot
@@ -23,7 +23,7 @@ export const paths = {
     return dataRoot()
   },
   get db(): string {
-    return join(dataRoot(), 'kurier.db')
+    return join(dataRoot(), 'gg-email.db')
   },
   get secrets(): string {
     return join(dataRoot(), 'secrets.bin')

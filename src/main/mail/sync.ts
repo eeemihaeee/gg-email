@@ -19,6 +19,22 @@ import { createImapClient, flagsToMask as imapFlagsToMask, normalizeAddresses, p
 import { parseRawMessage, makeSnippet } from './mime'
 import { buildRawMessage, sendPrepared } from './smtp'
 
+function friendlyError(message: string): string {
+  const value = message.toLowerCase()
+  if (value.includes('command failed') || value.includes('authentication') || value.includes('invalid credentials') || value.includes('auth')) {
+    return 'Сервер отклонил вход: проверьте логин и пароль приложения (для Gmail/Яндекса нужен пароль приложения или OAuth)'
+  }
+  if (value.includes('certificate') || value.includes('self signed')) {
+    return 'Сертификат сервера не доверенный: обратитесь в ИТ-отдел'
+  }
+  if (value.includes('timeout') || value.includes('timed out')) {
+    return 'Сервер не отвечает: проверьте сеть, VPN и порт'
+  }
+  if (value.includes('econnrefused') || value.includes('enotfound')) {
+    return 'Сервер недоступен: проверьте адрес и порт'
+  }
+  return message
+}
 const log = createLogger('sync')
 
 const INITIAL_BATCH = 200
@@ -63,6 +79,8 @@ export class AccountSyncer {
   private folderDebounce = new Map<string, NodeJS.Timeout>()
   private lastReconcile = new Map<string, number>()
   private syncing = false
+  private connecting = false
+  private lastError = ''
 
   constructor(
     private account: Account,
@@ -118,13 +136,16 @@ export class AccountSyncer {
     this.setStatus({ phase: 'connecting' })
     const client = await createImapClient(this.account)
     this.client = client
+    this.lastError = ''
+    this.connecting = true
 
     client.on('error', (error: Error) => {
+      this.lastError = error.message
       log.warn(`Ошибка соединения ${this.account.email}`, error.message)
     })
     client.on('close', () => {
-      if (this.stopped) return
-      this.handleDisconnect('Соединение закрыто')
+      if (this.stopped || this.connecting) return
+      this.handleDisconnect(friendlyError(this.lastError || 'Соединение закрыто сервером'))
     })
     client.on('exists', (data: { path: string }) => {
       const folder = this.ctx.folders.findByPath(this.account.id, data.path)
@@ -149,8 +170,12 @@ export class AccountSyncer {
 
     try {
       await client.connect()
+      this.connecting = false
     } catch (error) {
-      this.handleDisconnect(error instanceof Error ? error.message : String(error))
+      this.connecting = false
+      const message = error instanceof Error ? error.message : String(error)
+      this.lastError = message
+      this.handleDisconnect(friendlyError(message))
       return
     }
 
@@ -167,6 +192,7 @@ export class AccountSyncer {
 
   private handleDisconnect(reason: string): void {
     if (this.stopped) return
+    log.warn(`Соединение с ${this.account.email} потеряно: ${reason}`)
     this.client = null
     this.setStatus({ phase: 'offline', error: reason })
     if (this.reconnectTimer) return

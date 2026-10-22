@@ -43,8 +43,8 @@ export default function TitleBar(): React.JSX.Element {
   return (
     <header className="titlebar">
       <div className="titlebar-brand">
-        <span className="logo-mark">K</span>
-        <span className="brand-name">Kurier</span>
+        <span className="logo-mark">GG</span>
+        <span className="brand-name">GG Email</span>
       </div>
 
       <div className="titlebar-search">

@@ -153,7 +153,7 @@ export async function authorize(
       response.end(
         `<html><body style="font-family:Segoe UI,sans-serif;padding:40px">
          <h2>${error ? 'Не удалось войти' : 'Готово'}</h2>
-         <p>${error ? 'Окно можно закрыть и вернуться в Kurier.' : 'Можно закрыть эту вкладку и вернуться в Kurier.'}</p>
+         <p>${error ? 'Окно можно закрыть и вернуться в GG Email.' : 'Можно закрыть эту вкладку и вернуться в GG Email.'}</p>
          </body></html>`
       )
       clearTimeout(timeout)

@@ -13,8 +13,8 @@ const log = createLogger('main')
 
 // Позволяет держать профиль (кеш Chromium, БД, логи) рядом с проектом —
 // используется в автотестах и при переносимой установке.
-if (process.env.KURIER_USER_DATA) {
-  app.setPath('userData', process.env.KURIER_USER_DATA)
+if (process.env.GGEMAIL_USER_DATA) {
+  app.setPath('userData', process.env.GGEMAIL_USER_DATA)
 }
 
 protocol.registerSchemesAsPrivileged([
@@ -48,7 +48,7 @@ if (!gotLock) {
 }
 
 async function bootstrap(): Promise<void> {
-  app.setAppUserModelId('com.kurier.mail')
+  app.setAppUserModelId('com.gg.email')
 
   await app.whenReady()
 
@@ -178,9 +178,9 @@ function registerAttachmentProtocol(ctx: AppContext): void {
 }
 
 async function maybeCapture(window: BrowserWindow): Promise<void> {
-  const target = process.env.KURIER_SCREENSHOT
+  const target = process.env.GGEMAIL_SCREENSHOT
   if (!target) return
-  const delayMs = Number(process.env.KURIER_SCREENSHOT_DELAY ?? 1800)
+  const delayMs = Number(process.env.GGEMAIL_SCREENSHOT_DELAY ?? 1800)
   setTimeout(async () => {
     try {
       const image = await window.webContents.capturePage()
@@ -189,7 +189,7 @@ async function maybeCapture(window: BrowserWindow): Promise<void> {
     } catch (error) {
       log.error('Не удалось сделать скриншот', error)
     } finally {
-      if (process.env.KURIER_SCREENSHOT_EXIT !== '0') app.exit(0)
+      if (process.env.GGEMAIL_SCREENSHOT_EXIT !== '0') app.exit(0)
     }
   }, delayMs)
 }

@@ -1,4 +1,4 @@
-# Политики Kurier (ADMX/ADML)
+# Политики GG Email (ADMX/ADML)
 
 Файлы в этом каталоге генерируются из `src/shared/policy-catalog.json`:
 
@@ -10,21 +10,21 @@ npm run admx
 
 ```powershell
 # локально (нужны права администратора)
-.\Install-KurierADMX.ps1 -Backup
+.\Install-GGEmailADMX.ps1 -Backup
 
 # или в центральном хранилище домена
 \\domain\sysvol\domain\Policies\PolicyDefinitions
 ```
 
-После установки откройте `gpedit.msc` → Административные шаблоны → **Kurier Почта**.
+После установки откройте `gpedit.msc` → Административные шаблоны → **GG Email Почта**.
 В домене используется `gpmc.msc`; шаблоны подхватываются из Central Store.
 
 ## Ветки реестра
 
 | Ветка | Назначение | Приоритет |
 |---|---|---|
-| `HKLM\SOFTWARE\Policies\Kurier` | машинная политика (GPO компьютера) | выше |
-| `HKCU\SOFTWARE\Policies\Kurier` | пользовательская политика (GPO пользователя) | ниже |
+| `HKLM\SOFTWARE\Policies\GG Email` | машинная политика (GPO компьютера) | выше |
+| `HKCU\SOFTWARE\Policies\GG Email` | пользовательская политика (GPO пользователя) | ниже |
 
 Клиент читает обе ветки, машинное значение побеждает. Некорректные значения
 игнорируются и попадают в диагностику (раздел «Политики» в настройках).

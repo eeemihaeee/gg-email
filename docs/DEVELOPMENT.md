@@ -39,6 +39,8 @@ node node_modules/electron/install.js
 | `npm run typecheck` | `tsc` для main и renderer |
 | `npm test` | модульные тесты vitest |
 | `npm run dist` | сборка + NSIS-установщик в `release/` |
+| `npm run web` | веб-режим: сборка серверного бандла и запуск на 127.0.0.1:4173 |
+| `npm run build:web` | только сборка `out/web/server.cjs` |
 | `npm run admx` | генерация ADMX/ADML и справочника политик |
 
 ## Структура
@@ -48,7 +50,7 @@ src/main/            main-процесс
   index.ts           окно, протокол kurier-att://, меню, жизненный цикл
   app-context.ts     composition root, фоновые задачи
   ipc.ts             обработчики IPC (валидация, права, политики)
-  policy.ts          чтение HKLM/HKCU, наблюдатель, KURIER_POLICY_FILE
+  policy.ts          чтение HKLM/HKCU, наблюдатель, GGEMAIL_POLICY_FILE
   secrets.ts         DPAPI-хранилище
   updater.ts         electron-updater + политики
   db/                Database (node:sqlite), схема, репозитории
@@ -99,18 +101,18 @@ tests/               vitest
 
 ## Отладка
 
-- Логи: `%APPDATA%\Kurier\logs\kurier.log`; уровень — политика `LogLevel` или
-  `KURIER_POLICY_FILE`.
-- Отдельный профиль: `KURIER_USER_DATA=C:\temp\kurier-profile npm run dev`.
+- Логи: `%APPDATA%\GG Email\logs\kurier.log`; уровень — политика `LogLevel` или
+  `GGEMAIL_POLICY_FILE`.
+- Отдельный профиль: `GGEMAIL_USER_DATA=C:\temp\gg-profile npm run dev`.
 - Политики без домена:
 
   ```powershell
-  $env:KURIER_POLICY_FILE = "$PWD\tests\fixtures\policy.json"
+  $env:GGEMAIL_POLICY_FILE = "$PWD\tests\fixtures\policy.json"
   npm run dev
   ```
 
 - DevTools: `Ctrl+Shift+I` (меню «Вид»).
-- Скриншот окна: `KURIER_SCREENSHOT=shot.png npm run dev` (main сделает снимок и выйдет).
+- Скриншот окна: `GGEMAIL_SCREENSHOT=shot.png npm run dev` (main сделает снимок и выйдет).
 - Демонстрационный режим без Electron: `npm run build`, затем
   `node tools/serve-renderer.mjs out/renderer 4321` и откройте
   `http://127.0.0.1:4321/?demo=1&open=1` — интерфейс с синтетическими данными.
@@ -135,7 +137,7 @@ npm run dist
 
 Конфигурация — `electron-builder.yml`: NSIS, `perMachine: false`,
 `requestedExecutionLevel: asInvoker`, `differentialPackage: true`.
-Артефакты: `release/Kurier-Setup-<ver>.exe`, `.blockmap`, `latest.yml`.
+Артефакты: `release/GG-Email-Setup-<ver>.exe`, `.blockmap`, `latest.yml`.
 
 ## CI
 

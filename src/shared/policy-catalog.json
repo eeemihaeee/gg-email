@@ -1,41 +1,41 @@
 {
   "version": 1,
-  "rootKey": "SOFTWARE\\Policies\\Kurier",
-  "valuePrefix": "Kurier",
+  "rootKey": "SOFTWARE\\Policies\\GGEmail",
+  "valuePrefix": "GG Email",
   "categories": [
     {
-      "name": "Kurier",
-      "displayName": { "en": "Kurier Mail", "ru": "Kurier Почта" }
+      "name": "GGEmail",
+      "displayName": { "en": "GG Email Mail", "ru": "GG Email Почта" }
     },
     {
-      "name": "Kurier\\Accounts",
+      "name": "GGEmail\\Accounts",
       "displayName": { "en": "Accounts and servers", "ru": "Учётные записи и серверы" },
-      "parent": "Kurier"
+      "parent": "GG Email"
     },
     {
-      "name": "Kurier\\Updates",
+      "name": "GGEmail\\Updates",
       "displayName": { "en": "Updates", "ru": "Обновления" },
-      "parent": "Kurier"
+      "parent": "GG Email"
     },
     {
-      "name": "Kurier\\Security",
+      "name": "GGEmail\\Security",
       "displayName": { "en": "Security and content", "ru": "Безопасность и контент" },
-      "parent": "Kurier"
+      "parent": "GG Email"
     },
     {
-      "name": "Kurier\\Storage",
+      "name": "GGEmail\\Storage",
       "displayName": { "en": "Cache and storage", "ru": "Кеш и хранилище" },
-      "parent": "Kurier"
+      "parent": "GG Email"
     },
     {
-      "name": "Kurier\\Interface",
+      "name": "GGEmail\\Interface",
       "displayName": { "en": "Interface", "ru": "Интерфейс" },
-      "parent": "Kurier"
+      "parent": "GG Email"
     },
     {
-      "name": "Kurier\\Diagnostics",
+      "name": "GGEmail\\Diagnostics",
       "displayName": { "en": "Diagnostics", "ru": "Диагностика" },
-      "parent": "Kurier"
+      "parent": "GG Email"
     }
   ],
   "policies": [
@@ -43,7 +43,7 @@
       "key": "autoconfigUrl",
       "registryName": "AutoconfigUrl",
       "type": "string",
-      "category": "Kurier\\Accounts",
+      "category": "GGEmail\\Accounts",
       "default": "",
       "title": {
         "en": "Intranet autoconfiguration URL",
@@ -58,7 +58,7 @@
       "key": "preconfiguredAccounts",
       "registryName": "PreconfiguredAccounts",
       "type": "string",
-      "category": "Kurier\\Accounts",
+      "category": "GGEmail\\Accounts",
       "default": "",
       "title": {
         "en": "Preconfigured accounts (JSON)",
@@ -73,7 +73,7 @@
       "key": "allowAccountManagement",
       "registryName": "AllowAccountManagement",
       "type": "boolean",
-      "category": "Kurier\\Accounts",
+      "category": "GGEmail\\Accounts",
       "default": true,
       "title": {
         "en": "Allow users to add and edit accounts",
@@ -88,7 +88,7 @@
       "key": "allowOAuth",
       "registryName": "AllowOAuth",
       "type": "boolean",
-      "category": "Kurier\\Accounts",
+      "category": "GGEmail\\Accounts",
       "default": true,
       "title": { "en": "Allow OAuth2 sign-in", "ru": "Разрешить вход через OAuth2" },
       "description": {
@@ -100,7 +100,7 @@
       "key": "googleClientId",
       "registryName": "GoogleClientId",
       "type": "string",
-      "category": "Kurier\\Accounts",
+      "category": "GGEmail\\Accounts",
       "default": "",
       "title": { "en": "Google OAuth client ID", "ru": "Google OAuth client ID" },
       "description": {
@@ -112,7 +112,7 @@
       "key": "yandexClientId",
       "registryName": "YandexClientId",
       "type": "string",
-      "category": "Kurier\\Accounts",
+      "category": "GGEmail\\Accounts",
       "default": "",
       "title": { "en": "Yandex OAuth client ID", "ru": "Yandex OAuth client ID" },
       "description": {
@@ -124,7 +124,7 @@
       "key": "updateMode",
       "registryName": "UpdateMode",
       "type": "enum",
-      "category": "Kurier\\Updates",
+      "category": "GGEmail\\Updates",
       "default": "auto",
       "enum": ["auto", "notify", "disabled"],
       "title": { "en": "Update mode", "ru": "Режим обновлений" },
@@ -137,7 +137,7 @@
       "key": "updateChannel",
       "registryName": "UpdateChannel",
       "type": "enum",
-      "category": "Kurier\\Updates",
+      "category": "GGEmail\\Updates",
       "default": "stable",
       "enum": ["stable", "beta", "internal"],
       "title": { "en": "Update channel", "ru": "Канал обновлений" },
@@ -150,7 +150,7 @@
       "key": "updateBaseUrl",
       "registryName": "UpdateBaseUrl",
       "type": "string",
-      "category": "Kurier\\Updates",
+      "category": "GGEmail\\Updates",
       "default": "",
       "title": { "en": "Update server URL", "ru": "URL сервера обновлений" },
       "description": {
@@ -162,7 +162,7 @@
       "key": "updateCheckIntervalHours",
       "registryName": "UpdateCheckIntervalHours",
       "type": "number",
-      "category": "Kurier\\Updates",
+      "category": "GGEmail\\Updates",
       "default": 6,
       "min": 1,
       "max": 168,
@@ -176,7 +176,7 @@
       "key": "updateDeferDays",
       "registryName": "UpdateDeferDays",
       "type": "number",
-      "category": "Kurier\\Updates",
+      "category": "GGEmail\\Updates",
       "default": 0,
       "min": 0,
       "max": 30,
@@ -190,7 +190,7 @@
       "key": "blockRemoteContent",
       "registryName": "BlockRemoteContent",
       "type": "boolean",
-      "category": "Kurier\\Security",
+      "category": "GGEmail\\Security",
       "default": true,
       "title": { "en": "Block remote content in messages", "ru": "Блокировать внешний контент в письмах" },
       "description": {
@@ -202,7 +202,7 @@
       "key": "allowHtmlMail",
       "registryName": "AllowHtmlMail",
       "type": "boolean",
-      "category": "Kurier\\Security",
+      "category": "GGEmail\\Security",
       "default": true,
       "title": { "en": "Render HTML messages", "ru": "Отображать HTML-письма" },
       "description": {
@@ -214,7 +214,7 @@
       "key": "blockedAttachmentExtensions",
       "registryName": "BlockedAttachmentExtensions",
       "type": "multistring",
-      "category": "Kurier\\Security",
+      "category": "GGEmail\\Security",
       "default": "exe,dll,scr,bat,cmd,ps1,vbs,vbe,js,jse,wsf,wsh,msi,com,pif,hta,cpl,jar,lnk,reg",
       "title": { "en": "Blocked attachment extensions", "ru": "Заблокированные расширения вложений" },
       "description": {
@@ -226,7 +226,7 @@
       "key": "requireTls",
       "registryName": "RequireTls",
       "type": "boolean",
-      "category": "Kurier\\Security",
+      "category": "GGEmail\\Security",
       "default": true,
       "title": { "en": "Require encrypted connections", "ru": "Требовать шифрованные соединения" },
       "description": {
@@ -238,7 +238,7 @@
       "key": "maxCacheSizeMb",
       "registryName": "MaxCacheSizeMb",
       "type": "number",
-      "category": "Kurier\\Storage",
+      "category": "GGEmail\\Storage",
       "default": 4096,
       "min": 256,
       "max": 65536,
@@ -252,7 +252,7 @@
       "key": "cacheRetentionDays",
       "registryName": "CacheRetentionDays",
       "type": "number",
-      "category": "Kurier\\Storage",
+      "category": "GGEmail\\Storage",
       "default": 365,
       "min": 30,
       "max": 3650,
@@ -266,7 +266,7 @@
       "key": "syncIntervalMinutes",
       "registryName": "SyncIntervalMinutes",
       "type": "number",
-      "category": "Kurier\\Storage",
+      "category": "GGEmail\\Storage",
       "default": 5,
       "min": 1,
       "max": 120,
@@ -280,7 +280,7 @@
       "key": "defaultLanguage",
       "registryName": "DefaultLanguage",
       "type": "enum",
-      "category": "Kurier\\Interface",
+      "category": "GGEmail\\Interface",
       "default": "auto",
       "enum": ["auto", "ru", "en"],
       "title": { "en": "Interface language", "ru": "Язык интерфейса" },
@@ -293,7 +293,7 @@
       "key": "showPolicyBanner",
       "registryName": "ShowPolicyBanner",
       "type": "boolean",
-      "category": "Kurier\\Interface",
+      "category": "GGEmail\\Interface",
       "default": true,
       "title": { "en": "Show managed-by-organization banner", "ru": "Показывать баннер «управляется организацией»" },
       "description": {
@@ -305,7 +305,7 @@
       "key": "logLevel",
       "registryName": "LogLevel",
       "type": "enum",
-      "category": "Kurier\\Diagnostics",
+      "category": "GGEmail\\Diagnostics",
       "default": "warn",
       "enum": ["error", "warn", "info", "debug"],
       "title": { "en": "Log level", "ru": "Уровень логирования" },
@@ -318,7 +318,7 @@
       "key": "telemetryEnabled",
       "registryName": "TelemetryEnabled",
       "type": "boolean",
-      "category": "Kurier\\Diagnostics",
+      "category": "GGEmail\\Diagnostics",
       "default": false,
       "title": { "en": "Allow diagnostics telemetry", "ru": "Разрешить телеметрию диагностики" },
       "description": {

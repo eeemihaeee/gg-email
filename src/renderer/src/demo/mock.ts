@@ -290,7 +290,7 @@ const demoMessages: DemoMessage[] = [
     flags: flag(true),
     html: body([
       'Workflow <b>build-windows</b> завершён успешно.',
-      'Артефакты <code>Kurier-Setup-0.1.0.exe</code> и <code>Kurier-Setup-0.1.0.exe.blockmap</code> загружены в релиз.'
+      'Артефакты <code>GG-Email-Setup-0.1.0.exe</code> и <code>GG-Email-Setup-0.1.0.exe.blockmap</code> загружены в релиз.'
     ], 'GitHub Actions'),
     text: 'Workflow build-windows завершён успешно...'
   },
@@ -386,18 +386,19 @@ export function installDemoApi(): void {
       folders,
       policy,
       app: {
-        name: 'Kurier',
+        name: 'GG Email',
         version: '0.1.0',
         electron: '45.0.0',
         chrome: '140',
         node: '24.22.0',
         platform: 'win32',
         arch: 'x64',
-        userDataPath: 'C:\\Users\\ivan\\AppData\\Roaming\\Kurier',
-        dataPath: 'C:\\Users\\ivan\\AppData\\Roaming\\Kurier',
+        userDataPath: 'C:\\Users\\ivan\\AppData\\Roaming\\GG Email',
+        dataPath: 'C:\\Users\\ivan\\AppData\\Roaming\\GG Email',
         isPackaged: true
       },
-      updater: { status: 'idle', nextCheckAt: now + hour }
+      updater: { status: 'idle', nextCheckAt: now + hour },
+      sync: []
     }),
     accounts: {
       list: async () => accounts,
@@ -494,7 +495,7 @@ export function installDemoApi(): void {
     settings: {
       get: async () => ({
         language: 'auto' as const,
-        theme: 'dark' as const,
+        theme: 'system' as const,
         density: 'comfortable' as const,
         previewPane: 'right' as const,
         notifications: true,
@@ -518,7 +519,7 @@ export function installDemoApi(): void {
     },
     app: {
       info: async () => ({
-        name: 'Kurier',
+        name: 'GG Email',
         version: '0.1.0',
         electron: '45.0.0',
         chrome: '140',

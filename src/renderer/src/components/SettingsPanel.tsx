@@ -175,7 +175,7 @@ export default function SettingsPanel(): React.JSX.Element {
                 <h2>Обновления</h2>
                 <div className="updater-card">
                   <div>
-                    <strong>Kurier {appInfo?.version}</strong>
+                    <strong>GG Email {appInfo?.version}</strong>
                     <div className="dim small">
                       Канал: {String(policy.values.updateChannel ?? 'stable')} · режим:{' '}
                       {String(policy.values.updateMode ?? 'auto')}
@@ -202,7 +202,7 @@ export default function SettingsPanel(): React.JSX.Element {
                   </div>
                 </div>
                 <p className="dim small">
-                  Обновления устанавливаются в профиль пользователя (%LOCALAPPDATA%\Programs\Kurier)
+                  Обновления устанавливаются в профиль пользователя (%LOCALAPPDATA%\Programs\GG Email)
                   и не требуют прав администратора. Администратор управляет каналом, интервалом и
                   отсрочкой через групповые политики.
                 </p>

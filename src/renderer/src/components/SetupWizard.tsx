@@ -192,7 +192,7 @@ export default function SetupWizard(): React.JSX.Element {
         {step === 'email' && (
           <div className="wizard-body">
             <p className="dim">
-              Kurier поддерживает mailcow, Gmail, Яндекс, Mail.ru и любой сервер IMAP/SMTP.
+              GG Email поддерживает mailcow, Gmail, Яндекс, Mail.ru и любой сервер IMAP/SMTP.
               Настройки серверов подставятся автоматически.
             </p>
             <label className="field">
@@ -361,7 +361,7 @@ export default function SetupWizard(): React.JSX.Element {
             </div>
             <h2>Ящик добавлен</h2>
             <p className="dim">
-              Kurier загружает заголовки писем в локальный кеш. Это занимает несколько секунд,
+              GG Email загружает заголовки писем в локальный кеш. Это занимает несколько секунд,
               интерфейс уже доступен.
             </p>
             <button className="btn primary" onClick={closeOverlay}>
