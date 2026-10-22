@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<policyDefinitionResources revision="1.0" schemaVersion="1.0" xmlns="http://schemas.microsoft.com/GroupPolicy/2006/07/PolicyDefinitions">
+  <displayName>Kurier Mail</displayName>
+  <description>Kurier corporate mail client policies</description>
+  <resources>
+    <stringTable>
+      <string id="Kurier">Kurier Mail</string>
+      <string id="Kurier_Accounts">Accounts and servers</string>
+      <string id="Kurier_Updates">Updates</string>
+      <string id="Kurier_Security">Security and content</string>
+      <string id="Kurier_Storage">Cache and storage</string>
+      <string id="Kurier_Interface">Interface</string>
+      <string id="Kurier_Diagnostics">Diagnostics</string>
+      <string id="AutoconfigUrl">Intranet autoconfiguration URL</string>
+      <string id="AutoconfigUrl_Help">Base URL of Thunderbird-style autoconfig XML (for example https://autoconfig.example.com/mail/config-v1.1.xml?emailaddress=%EMAIL%). The client queries it before public sources.</string>
+      <string id="PreconfiguredAccounts">Preconfigured accounts (JSON)</string>
+      <string id="PreconfiguredAccounts_Help">JSON array of account templates offered during onboarding. Passwords never stored in policy: users enter them once.</string>
+      <string id="AllowAccountManagement">Allow users to add and edit accounts</string>
+      <string id="AllowAccountManagement_Help">When disabled, the account list is fixed by policy and the account editor is hidden.</string>
+      <string id="AllowOAuth">Allow OAuth2 sign-in</string>
+      <string id="AllowOAuth_Help">Enables OAuth2 for Gmail and Yandex when client IDs are configured.</string>
+      <string id="GoogleClientId">Google OAuth client ID</string>
+      <string id="GoogleClientId_Help">OAuth client ID of the company application registered in Google Cloud (Desktop app type).</string>
+      <string id="YandexClientId">Yandex OAuth client ID</string>
+      <string id="YandexClientId_Help">OAuth client ID of the application registered in Yandex ID.</string>
+      <string id="UpdateMode">Update mode</string>
+      <string id="UpdateMode_Help">auto — download and install silently on exit; notify — download and ask the user; disabled — no update checks.</string>
+      <string id="UpdateMode_auto">Automatic</string>
+      <string id="UpdateMode_notify">Notify</string>
+      <string id="UpdateMode_disabled">Disabled</string>
+      <string id="UpdateChannel">Update channel</string>
+      <string id="UpdateChannel_Help">Which release channel the client follows.</string>
+      <string id="UpdateChannel_stable">Stable</string>
+      <string id="UpdateChannel_beta">Beta</string>
+      <string id="UpdateChannel_internal">Internal</string>
+      <string id="UpdateBaseUrl">Update server URL</string>
+      <string id="UpdateBaseUrl_Help">Overrides the built-in update feed (generic provider). Leave empty to use the default feed.</string>
+      <string id="UpdateCheckIntervalHours">Update check interval, hours</string>
+      <string id="UpdateCheckIntervalHours_Help">How often the client checks for updates. Minimal 1 hour, maximal 168 hours (7 days).</string>
+      <string id="UpdateDeferDays">Defer updates, days</string>
+      <string id="UpdateDeferDays_Help">Delay installation of a new version for the specified number of days. 0 — install immediately.</string>
+      <string id="BlockRemoteContent">Block remote content in messages</string>
+      <string id="BlockRemoteContent_Help">Blocks images, styles and tracking pixels loaded from the internet until the user allows them.</string>
+      <string id="AllowHtmlMail">Render HTML messages</string>
+      <string id="AllowHtmlMail_Help">When disabled, only the plain-text part is shown.</string>
+      <string id="BlockedAttachmentExtensions">Blocked attachment extensions</string>
+      <string id="BlockedAttachmentExtensions_Help">Comma-separated list of extensions that cannot be opened or saved from messages.</string>
+      <string id="RequireTls">Require encrypted connections</string>
+      <string id="RequireTls_Help">Forbids plain-text IMAP/SMTP connections; accounts with security=none are rejected.</string>
+      <string id="MaxCacheSizeMb">Maximum local cache, MB</string>
+      <string id="MaxCacheSizeMb_Help">Soft limit for the local message cache; oldest bodies are evicted first.</string>
+      <string id="CacheRetentionDays">Keep message headers, days</string>
+      <string id="CacheRetentionDays_Help">Headers older than this are removed from the local cache; messages stay on the server.</string>
+      <string id="SyncIntervalMinutes">Background sync interval, minutes</string>
+      <string id="SyncIntervalMinutes_Help">Fallback polling interval when IMAP IDLE is unavailable.</string>
+      <string id="DefaultLanguage">Interface language</string>
+      <string id="DefaultLanguage_Help">auto — follow the Windows display language.</string>
+      <string id="DefaultLanguage_auto">Automatic</string>
+      <string id="DefaultLanguage_ru">Russian</string>
+      <string id="DefaultLanguage_en">English</string>
+      <string id="ShowPolicyBanner">Show managed-by-organization banner</string>
+      <string id="ShowPolicyBanner_Help">Shows a small notice when at least one setting is managed by group policy.</string>
+      <string id="LogLevel">Log level</string>
+      <string id="LogLevel_Help">Verbosity of local logs. Logs never contain passwords or message bodies.</string>
+      <string id="LogLevel_error">Errors only</string>
+      <string id="LogLevel_warn">Warnings</string>
+      <string id="LogLevel_info">Information</string>
+      <string id="LogLevel_debug">Debug</string>
+      <string id="TelemetryEnabled">Allow diagnostics telemetry</string>
+      <string id="TelemetryEnabled_Help">Sends anonymous crash and performance counters to the configured endpoint. Disabled by default.</string>
+    </stringTable>
+    <presentationTable>
+      <presentation id="AutoconfigUrl">
+        <textBox refId="AutoconfigUrl_Value"><label>Intranet autoconfiguration URL</label></textBox>
+      </presentation>
+      <presentation id="PreconfiguredAccounts">
+        <textBox refId="PreconfiguredAccounts_Value"><label>Preconfigured accounts (JSON)</label></textBox>
+      </presentation>
+      <presentation id="GoogleClientId">
+        <textBox refId="GoogleClientId_Value"><label>Google OAuth client ID</label></textBox>
+      </presentation>
+      <presentation id="YandexClientId">
+        <textBox refId="YandexClientId_Value"><label>Yandex OAuth client ID</label></textBox>
+      </presentation>
+      <presentation id="UpdateMode">
+        <dropdownList refId="UpdateMode_Value" defaultItem="0" noSort="true">Update mode</dropdownList>
+      </presentation>
+      <presentation id="UpdateChannel">
+        <dropdownList refId="UpdateChannel_Value" defaultItem="0" noSort="true">Update channel</dropdownList>
+      </presentation>
+      <presentation id="UpdateBaseUrl">
+        <textBox refId="UpdateBaseUrl_Value"><label>Update server URL</label></textBox>
+      </presentation>
+      <presentation id="UpdateCheckIntervalHours">
+        <decimalTextBox refId="UpdateCheckIntervalHours_Value" defaultValue="6" spinStep="1">Update check interval, hours</decimalTextBox>
+      </presentation>
+      <presentation id="UpdateDeferDays">
+        <decimalTextBox refId="UpdateDeferDays_Value" defaultValue="0" spinStep="1">Defer updates, days</decimalTextBox>
+      </presentation>
+      <presentation id="BlockedAttachmentExtensions">
+        <multiTextBox refId="BlockedAttachmentExtensions_Value">Blocked attachment extensions</multiTextBox>
+      </presentation>
+      <presentation id="MaxCacheSizeMb">
+        <decimalTextBox refId="MaxCacheSizeMb_Value" defaultValue="4096" spinStep="1">Maximum local cache, MB</decimalTextBox>
+      </presentation>
+      <presentation id="CacheRetentionDays">
+        <decimalTextBox refId="CacheRetentionDays_Value" defaultValue="365" spinStep="1">Keep message headers, days</decimalTextBox>
+      </presentation>
+      <presentation id="SyncIntervalMinutes">
+        <decimalTextBox refId="SyncIntervalMinutes_Value" defaultValue="5" spinStep="1">Background sync interval, minutes</decimalTextBox>
+      </presentation>
+      <presentation id="DefaultLanguage">
+        <dropdownList refId="DefaultLanguage_Value" defaultItem="0" noSort="true">Interface language</dropdownList>
+      </presentation>
+      <presentation id="LogLevel">
+        <dropdownList refId="LogLevel_Value" defaultItem="0" noSort="true">Log level</dropdownList>
+      </presentation>
+    </presentationTable>
+  </resources>
+</policyDefinitionResources>

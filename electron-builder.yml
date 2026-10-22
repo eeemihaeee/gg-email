@@ -1,0 +1,43 @@
+appId: com.kurier.mail
+productName: Kurier
+copyright: © Kurier Team
+directories:
+  buildResources: build
+  output: release
+
+files:
+  - out/**/*
+  - package.json
+  - '!**/*.map'
+
+asar: true
+compression: maximum
+
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  icon: build/icon.ico
+  artifactName: Kurier-Setup-${version}.${ext}
+  # Установка и обновления не требуют прав администратора.
+  requestedExecutionLevel: asInvoker
+  legalTrademarks: Kurier
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowElevation: false
+  allowToChangeInstallationDirectory: false
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Kurier
+  uninstallDisplayName: Kurier Mail
+  deleteAppDataOnUninstall: false
+  differentialPackage: true
+  include: build/installer.nsh
+
+publish:
+  provider: generic
+  url: https://updates.example.com/kurier/
+  channel: latest

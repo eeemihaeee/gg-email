@@ -1,0 +1,17 @@
+node_modules/
+out/
+dist/
+release/
+.npm-cache/
+.cache/
+.tmp/
+.userdata/
+.edge-profile*/
+*.log
+.vite/
+coverage/
+*.db
+*.db-wal
+*.db-shm
+shot*.png
+probe/

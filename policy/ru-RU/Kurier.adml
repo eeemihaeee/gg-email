@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<policyDefinitionResources revision="1.0" schemaVersion="1.0" xmlns="http://schemas.microsoft.com/GroupPolicy/2006/07/PolicyDefinitions">
+  <displayName>Kurier Почта</displayName>
+  <description>Политики корпоративного почтового клиента Kurier</description>
+  <resources>
+    <stringTable>
+      <string id="Kurier">Kurier Почта</string>
+      <string id="Kurier_Accounts">Учётные записи и серверы</string>
+      <string id="Kurier_Updates">Обновления</string>
+      <string id="Kurier_Security">Безопасность и контент</string>
+      <string id="Kurier_Storage">Кеш и хранилище</string>
+      <string id="Kurier_Interface">Интерфейс</string>
+      <string id="Kurier_Diagnostics">Диагностика</string>
+      <string id="AutoconfigUrl">URL автонастройки во внутренней сети</string>
+      <string id="AutoconfigUrl_Help">Базовый URL автонастройки в формате Thunderbird (например https://autoconfig.example.com/mail/config-v1.1.xml?emailaddress=%EMAIL%). Клиент обращается к нему раньше публичных источников.</string>
+      <string id="PreconfiguredAccounts">Предустановленные учётные записи (JSON)</string>
+      <string id="PreconfiguredAccounts_Help">JSON-массив шаблонов учётных записей, предлагаемых при первом запуске. Пароли в политике не хранятся: пользователь вводит их один раз.</string>
+      <string id="AllowAccountManagement">Разрешить пользователям добавлять и изменять учётные записи</string>
+      <string id="AllowAccountManagement_Help">Если отключено, список учётных записей фиксируется политикой, а редактор скрывается.</string>
+      <string id="AllowOAuth">Разрешить вход через OAuth2</string>
+      <string id="AllowOAuth_Help">Включает OAuth2 для Gmail и Яндекс, если настроены client_id.</string>
+      <string id="GoogleClientId">Google OAuth client ID</string>
+      <string id="GoogleClientId_Help">Client ID корпоративного приложения, зарегистрированного в Google Cloud (тип Desktop app).</string>
+      <string id="YandexClientId">Yandex OAuth client ID</string>
+      <string id="YandexClientId_Help">Client ID приложения, зарегистрированного в Яндекс ID.</string>
+      <string id="UpdateMode">Режим обновлений</string>
+      <string id="UpdateMode_Help">auto — скачивать и устанавливать тихо при выходе; notify — скачивать и спрашивать пользователя; disabled — не проверять обновления.</string>
+      <string id="UpdateMode_auto">Автоматически</string>
+      <string id="UpdateMode_notify">Уведомлять</string>
+      <string id="UpdateMode_disabled">Отключено</string>
+      <string id="UpdateChannel">Канал обновлений</string>
+      <string id="UpdateChannel_Help">Канал выпусков, за которым следует клиент.</string>
+      <string id="UpdateChannel_stable">Стабильный</string>
+      <string id="UpdateChannel_beta">Бета</string>
+      <string id="UpdateChannel_internal">Внутренний</string>
+      <string id="UpdateBaseUrl">URL сервера обновлений</string>
+      <string id="UpdateBaseUrl_Help">Переопределяет встроенный источник обновлений (generic provider). Пусто — использовать источник по умолчанию.</string>
+      <string id="UpdateCheckIntervalHours">Интервал проверки обновлений, часы</string>
+      <string id="UpdateCheckIntervalHours_Help">Как часто клиент проверяет обновления. Минимум 1 час, максимум 168 часов (7 дней).</string>
+      <string id="UpdateDeferDays">Отсрочка обновлений, дни</string>
+      <string id="UpdateDeferDays_Help">Задерживать установку новой версии на указанное число дней. 0 — устанавливать сразу.</string>
+      <string id="BlockRemoteContent">Блокировать внешний контент в письмах</string>
+      <string id="BlockRemoteContent_Help">Блокирует картинки, стили и трекинг-пиксели из интернета до явного разрешения пользователя.</string>
+      <string id="AllowHtmlMail">Отображать HTML-письма</string>
+      <string id="AllowHtmlMail_Help">Если отключено, показывается только текстовая часть письма.</string>
+      <string id="BlockedAttachmentExtensions">Заблокированные расширения вложений</string>
+      <string id="BlockedAttachmentExtensions_Help">Список расширений через запятую, которые нельзя открыть или сохранить из письма.</string>
+      <string id="RequireTls">Требовать шифрованные соединения</string>
+      <string id="RequireTls_Help">Запрещает незашифрованные подключения IMAP/SMTP; учётные записи с security=none отклоняются.</string>
+      <string id="MaxCacheSizeMb">Максимальный размер кеша, МБ</string>
+      <string id="MaxCacheSizeMb_Help">Мягкий лимит локального кеша писем; первыми вытесняются самые старые тела писем.</string>
+      <string id="CacheRetentionDays">Хранить заголовки писем, дни</string>
+      <string id="CacheRetentionDays_Help">Заголовки старше указанного срока удаляются из локального кеша; письма остаются на сервере.</string>
+      <string id="SyncIntervalMinutes">Интервал фоновой синхронизации, минуты</string>
+      <string id="SyncIntervalMinutes_Help">Резервный интервал опроса, если IMAP IDLE недоступен.</string>
+      <string id="DefaultLanguage">Язык интерфейса</string>
+      <string id="DefaultLanguage_Help">auto — использовать язык Windows.</string>
+      <string id="DefaultLanguage_auto">Автоматически</string>
+      <string id="DefaultLanguage_ru">Русский</string>
+      <string id="DefaultLanguage_en">Английский</string>
+      <string id="ShowPolicyBanner">Показывать баннер «управляется организацией»</string>
+      <string id="ShowPolicyBanner_Help">Показывает уведомление, если хотя бы одна настройка управляется групповой политикой.</string>
+      <string id="LogLevel">Уровень логирования</string>
+      <string id="LogLevel_Help">Подробность локальных логов. Логи не содержат паролей и тел писем.</string>
+      <string id="LogLevel_error">Только ошибки</string>
+      <string id="LogLevel_warn">Предупреждения</string>
+      <string id="LogLevel_info">Информация</string>
+      <string id="LogLevel_debug">Отладка</string>
+      <string id="TelemetryEnabled">Разрешить телеметрию диагностики</string>
+      <string id="TelemetryEnabled_Help">Отправляет анонимные счётчики сбоев и производительности на настроенный сервер. По умолчанию выключено.</string>
+    </stringTable>
+    <presentationTable>
+      <presentation id="AutoconfigUrl">
+        <textBox refId="AutoconfigUrl_Value"><label>URL автонастройки во внутренней сети</label></textBox>
+      </presentation>
+      <presentation id="PreconfiguredAccounts">
+        <textBox refId="PreconfiguredAccounts_Value"><label>Предустановленные учётные записи (JSON)</label></textBox>
+      </presentation>
+      <presentation id="GoogleClientId">
+        <textBox refId="GoogleClientId_Value"><label>Google OAuth client ID</label></textBox>
+      </presentation>
+      <presentation id="YandexClientId">
+        <textBox refId="YandexClientId_Value"><label>Yandex OAuth client ID</label></textBox>
+      </presentation>
+      <presentation id="UpdateMode">
+        <dropdownList refId="UpdateMode_Value" defaultItem="0" noSort="true">Режим обновлений</dropdownList>
+      </presentation>
+      <presentation id="UpdateChannel">
+        <dropdownList refId="UpdateChannel_Value" defaultItem="0" noSort="true">Канал обновлений</dropdownList>
+      </presentation>
+      <presentation id="UpdateBaseUrl">
+        <textBox refId="UpdateBaseUrl_Value"><label>URL сервера обновлений</label></textBox>
+      </presentation>
+      <presentation id="UpdateCheckIntervalHours">
+        <decimalTextBox refId="UpdateCheckIntervalHours_Value" defaultValue="6" spinStep="1">Интервал проверки обновлений, часы</decimalTextBox>
+      </presentation>
+      <presentation id="UpdateDeferDays">
+        <decimalTextBox refId="UpdateDeferDays_Value" defaultValue="0" spinStep="1">Отсрочка обновлений, дни</decimalTextBox>
+      </presentation>
+      <presentation id="BlockedAttachmentExtensions">
+        <multiTextBox refId="BlockedAttachmentExtensions_Value">Заблокированные расширения вложений</multiTextBox>
+      </presentation>
+      <presentation id="MaxCacheSizeMb">
+        <decimalTextBox refId="MaxCacheSizeMb_Value" defaultValue="4096" spinStep="1">Максимальный размер кеша, МБ</decimalTextBox>
+      </presentation>
+      <presentation id="CacheRetentionDays">
+        <decimalTextBox refId="CacheRetentionDays_Value" defaultValue="365" spinStep="1">Хранить заголовки писем, дни</decimalTextBox>
+      </presentation>
+      <presentation id="SyncIntervalMinutes">
+        <decimalTextBox refId="SyncIntervalMinutes_Value" defaultValue="5" spinStep="1">Интервал фоновой синхронизации, минуты</decimalTextBox>
+      </presentation>
+      <presentation id="DefaultLanguage">
+        <dropdownList refId="DefaultLanguage_Value" defaultItem="0" noSort="true">Язык интерфейса</dropdownList>
+      </presentation>
+      <presentation id="LogLevel">
+        <dropdownList refId="LogLevel_Value" defaultItem="0" noSort="true">Уровень логирования</dropdownList>
+      </presentation>
+    </presentationTable>
+  </resources>
+</policyDefinitionResources>

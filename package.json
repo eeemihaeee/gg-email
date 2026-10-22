@@ -1,0 +1,54 @@
+{
+  "name": "kurier",
+  "productName": "Kurier",
+  "version": "0.1.0",
+  "description": "Kurier — корпоративный почтовый клиент для Windows",
+  "author": {
+    "name": "Kurier Team",
+    "email": "it@example.com"
+  },
+  "license": "UNLICENSED",
+  "private": true,
+  "main": "./out/main/index.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "start": "electron-vite preview",
+    "typecheck": "tsc -p tsconfig.node.json --noEmit && tsc -p tsconfig.web.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "admx": "node tools/gen-admx.mjs",
+    "dist": "npm run build && electron-builder --win nsis --x64",
+    "dist:dir": "npm run build && electron-builder --win dir --x64"
+  },
+  "dependencies": {
+    "@tanstack/react-virtual": "^3.14.22",
+    "dompurify": "^3.4.17",
+    "electron-log": "^5.4.4",
+    "electron-updater": "^6.8.9",
+    "imapflow": "^2.9.0",
+    "mailparser": "^3.12.2",
+    "nodemailer": "^10.2.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "zod": "^4.6.7",
+    "zustand": "^5.0.16"
+  },
+  "devDependencies": {
+    "@types/mailparser": "^3.9.0",
+    "@types/node": "^24.0.0",
+    "@types/nodemailer": "^8.0.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "electron": "^45.0.0",
+    "electron-builder": "^26.15.3",
+    "electron-vite": "^6.0.0",
+    "typescript": "^5.9.3",
+    "vite": "^8.3.5",
+    "vitest": "^5.0.5"
+  }
+}

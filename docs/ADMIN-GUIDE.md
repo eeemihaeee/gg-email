@@ -1,0 +1,286 @@
+# Руководство администратора
+
+Документ описывает развёртывание Kurier в домене Windows, настройку почтовых
+серверов, групповых политик, обновлений и диагностику.
+
+## 1. Требования
+
+| Компонент | Требование |
+|---|---|
+| ОС | Windows 10 1903+ / Windows 11, x64 |
+| Права пользователя | обычные (установка per-user, без UAC) |
+| Память | от 4 ГБ на рабочей станции; Kurier занимает ~150–250 МБ |
+| Диск | ~400 МБ на установку + кеш (лимитируется политикой) |
+| Сеть | IMAP 993/143 (STARTTLS), SMTP 465/587; HTTPS для обновлений и автонастройки |
+| Домен | не обязателен: ADMX работает и в локальной политике |
+
+Отдельных runtime-компонентов (WebView2, .NET) не требуется — Electron включает Chromium.
+
+## 2. Состав поставки
+
+```
+Kurier-Setup-0.1.0.exe      установщик NSIS (per-user)
+policy/Kurier.admx          шаблон политик
+policy/ru-RU/Kurier.adml    локализация
+policy/en-US/Kurier.adml
+policy/Install-KurierADMX.ps1
+policy/New-KurierGPO.ps1
+policy/Test-Policy.ps1
+policy/README.md            справочник политик
+```
+
+## 3. Установка
+
+### 3.1 Вручную
+
+Запустить `Kurier-Setup-0.1.0.exe`, выбрать «Только для меня» (по умолчанию).
+Установка идёт в `%LOCALAPPDATA%\Programs\Kurier`, права администратора не нужны.
+
+### 3.2 Тихая установка
+
+```powershell
+Kurier-Setup-0.1.0.exe /S
+```
+
+Код возврата 0 — успех. Ярлыки создаются в профиле пользователя.
+
+### 3.3 SCCM / Intune
+
+- Тип развёртывания: **Application**, установка от имени пользователя (`Install behavior: User`).
+- Команда: `Kurier-Setup-0.1.0.exe /S`.
+- Detection: файл `%LOCALAPPDATA%\Programs\Kurier\Kurier.exe` существует, версия из
+  `%LOCALAPPDATA%\Programs\Kurier\resources\app-update.yml` или из реестра
+  `HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall\*` (DisplayName = Kurier Mail).
+- Обновления можно не публиковать через SCCM: клиент обновляется сам по политике.
+
+### 3.4 Терминальные серверы (RDS)
+
+Каждый пользователь получает свой экземпляр в своём профиле — дополнительных
+настроек не требуется. Для экономии диска ограничьте `MaxCacheSizeMb` (например, 1024)
+и `CacheRetentionDays` (90).
+
+## 4. Подключение mailcow
+
+### 4.1 Автонастройка (рекомендуется)
+
+mailcow публикует autoconfig по адресу:
+
+```
+https://mail.company.ru/autoconfig/mail/config-v1.1.xml?emailaddress=%EMAIL%
+```
+
+Задайте политику `AutoconfigUrl` — клиент обратится к ней раньше публичных источников:
+
+```powershell
+Set-GPRegistryValue -Name 'Kurier Mail' -Key 'SOFTWARE\Policies\Kurier' `
+  -ValueName 'AutoconfigUrl' -Type String `
+  -Value 'https://mail.company.ru/autoconfig/mail/config-v1.1.xml?emailaddress=%EMAIL%'
+```
+
+Пользователь в мастере вводит только адрес и пароль — серверы подставляются сами.
+
+### 4.2 Без автонастройки
+
+Клиент попробует `autoconfig.<домен>`, `<домен>/.well-known/autoconfig/...`,
+базу Thunderbird, затем предложит `imap.<домен>:993` / `smtp.<домен>:465`.
+Если имена отличаются, пользователь включает «Дополнительные настройки» и вводит их вручную
+(или администратор задаёт через `PreconfiguredAccounts`).
+
+### 4.3 Проверка
+
+В мастере нажмите «Проверить подключение» — выполняется реальный вход по IMAP и SMTP.
+
+## 5. Gmail и Яндекс
+
+### 5.1 Пароли приложений (быстрый путь)
+
+- Gmail: включить двухэтапную аутентификацию → «Пароли приложений» → создать пароль.
+- Яндекс: Яндекс ID → «Безопасность» → «Пароли приложений» → «Почта».
+
+Пользователь вводит пароль приложения в мастере, серверы подставляются из пресета.
+
+### 5.2 OAuth2 (рекомендуется для домена)
+
+**Google**
+
+1. Google Cloud Console → создать проект.
+2. APIs & Services → OAuth consent screen → тип **Internal** (для Workspace).
+3. Credentials → Create credentials → OAuth client ID → **Desktop app**.
+4. Скопировать Client ID.
+5. Задать политику `GoogleClientId` (и при необходимости `GoogleClientSecret`).
+6. Убедиться, что `AllowOAuth` включена.
+
+В мастере появится кнопка «Войти» — откроется браузер, после согласия токен сохранится
+в DPAPI, пароль не потребуется.
+
+**Яндекс**
+
+1. Яндекс ID → «Создать приложение» → платформа «Веб-сервисы».
+2. Доступы: `mail:imap_full`, `mail:smtp`.
+3. Redirect URI: `http://127.0.0.1` (loopback, порт назначается динамически).
+4. Задать `YandexClientId`, при необходимости `YandexClientSecret`.
+
+> OAuth-приложение должно быть разрешено в организации (Google Workspace → API controls).
+> Без client_id кнопка OAuth не показывается, остаётся вход по паролю приложения.
+
+## 6. Групповые политики (ADMX)
+
+### 6.1 Установка шаблонов
+
+```powershell
+# на рабочей станции (администратор)
+.\policy\Install-KurierADMX.ps1 -Backup
+
+# в домене — Central Store
+copy policy\Kurier.admx  \\domain\sysvol\domain\Policies\PolicyDefinitions\
+copy policy\ru-RU\Kurier.adml \\domain\sysvol\domain\Policies\PolicyDefinitions\ru-RU\
+copy policy\en-US\Kurier.adml \\domain\sysvol\domain\Policies\PolicyDefinitions\en-US\
+```
+
+После этого политики видны в `gpedit.msc` / `gpmc.msc`:
+**Конфигурация компьютера (и пользователя) → Административные шаблоны → Kurier Почта**.
+
+### 6.2 Создание GPO
+
+```powershell
+.\policy\New-KurierGPO.ps1 `
+  -Name 'Kurier Mail' `
+  -AutoconfigUrl 'https://mail.company.ru/autoconfig/mail/config-v1.1.xml?emailaddress=%EMAIL%' `
+  -UpdateMode auto `
+  -UpdateChannel stable
+
+New-GPLink -Name 'Kurier Mail' -Target 'OU=Workstations,DC=company,DC=ru'
+```
+
+Скрипт задаёт базовый набор: обновления, блокировку внешнего контента, TLS,
+интервал синхронизации, лимит кеша и уровень логов.
+
+### 6.3 Приоритет и источники
+
+| Источник | Расположение | Приоритет |
+|---|---|---|
+| Машинная политика | `HKLM\SOFTWARE\Policies\Kurier` | высший |
+| Пользовательская политика | `HKCU\SOFTWARE\Policies\Kurier` | ниже |
+| Локальные настройки пользователя | SQLite `settings` | ниже политик |
+| Значения по умолчанию | каталог политик | низший |
+
+Изменения применяются без перезапуска: клиент опрашивает реестр каждые 2 минуты
+(и при старте). В настройках, раздел «Политики», видно, что применено и из какой ветки.
+
+### 6.4 Проверка без домена
+
+```powershell
+.\policy\Test-Policy.ps1          # записать тестовые значения в HKCU
+# запустить Kurier → Настройки → Политики
+.\policy\Test-Policy.ps1 -Remove  # убрать
+```
+
+### 6.5 Рекомендованные политики
+
+| Политика | Значение | Комментарий |
+|---|---|---|
+| `AutoconfigUrl` | URL mailcow | мастер в один шаг |
+| `AllowAccountManagement` | Отключено | фиксированный набор ящиков |
+| `UpdateMode` | `auto` | обновления без пользователя |
+| `UpdateChannel` | `stable` | предсказуемость |
+| `UpdateDeferDays` | `2` | время откатить проблемный релиз |
+| `BlockRemoteContent` | Включено | антитрекинг |
+| `RequireTls` | Включено | запрет plaintext |
+| `AllowHtmlMail` | Включено | иначе только текст |
+| `BlockedAttachmentExtensions` | `exe,dll,scr,bat,cmd,ps1,vbs,js,msi,lnk` | блокировка опасных вложений |
+| `MaxCacheSizeMb` | `2048` | размер кеша на пользователя |
+| `CacheRetentionDays` | `180` | автоочистка тел |
+| `SyncIntervalMinutes` | `5` | резервный опрос |
+| `LogLevel` | `warn` | меньше шума |
+
+## 7. Обновления
+
+### 7.1 Схема
+
+```
+Kurier-Setup-0.1.0.exe ──┐
+Kurier-Setup-0.1.0.exe.blockmap ──> HTTPS-каталог ──> electron-updater
+latest.yml ───────────────┘
+```
+
+Клиент скачивает только разницу (blockmap), проверяет SHA-512, устанавливает
+при выходе. Права администратора не нужны.
+
+### 7.2 Публикация
+
+```powershell
+npm run dist
+# выложить на сервер обновлений:
+#   release/Kurier-Setup-<ver>.exe
+#   release/Kurier-Setup-<ver>.exe.blockmap
+#   release/latest.yml
+```
+
+`UpdateBaseUrl` в политике указывает на каталог, например
+`https://updates.company.ru/kurier/`. Для канала `beta` публикуйте `beta.yml`.
+
+### 7.3 Откат
+
+Опубликуйте предыдущую версию с большим номером (например, 0.1.1-hotfix), либо
+временно поднимите `UpdateDeferDays`. Автоматического «понижения» версии
+electron-updater не выполняет — это осознанное ограничение.
+
+### 7.4 Подпись
+
+Настройте сертификат подписи кода (EV или внутренний CA) в переменных окружения
+`CSC_LINK`/`CSC_KEY_PASSWORD` при сборке. Без подписи SmartScreen будет предупреждать
+пользователей при первой установке.
+
+## 8. Безопасность
+
+- Пароли и токены — в `%APPDATA%\Kurier\secrets.bin`, шифруются DPAPI текущего
+  пользователя. Резервное копирование файла бессмысленно на другой машине.
+- TLS обязателен при `RequireTls = 1`; самоподписанные сертификаты не принимаются.
+- HTML отображается в sandboxed iframe с CSP, скрипты и фреймы запрещены.
+- Внешние изображения блокируются до явного разрешения (по умолчанию).
+- Опасные вложения блокируются на уровне main-процесса (не только UI).
+- Логи не содержат тел писем и паролей (маскирование).
+
+## 9. Диагностика
+
+| Что | Где |
+|---|---|
+| Логи | `%APPDATA%\Kurier\logs\kurier.log` (уровень — политика `LogLevel`) |
+| База | `%APPDATA%\Kurier\kurier.db` (SQLite; можно открыть DB Browser) |
+| Вложения | `%APPDATA%\Kurier\attachments\` |
+| Версия/компоненты | Настройки → О программе |
+| Политики | Настройки → Политики |
+| Сброс кеша | Настройки → О программе → Очистить кеш |
+
+Типовые проблемы:
+
+| Симптом | Причина | Решение |
+|---|---|---|
+| «Нет соединения» | порт/фаервол/сертификат | проверить 993/465, валидность сертификата |
+| IMAP вход отклонён | пароль приложения не создан | включить 2FA и пароль приложения |
+| Gmail: «Application-specific password required» | нет OAuth | настроить `GoogleClientId` или пароль приложения |
+| Письма есть на сервере, но не в клиенте | папка не входит в список ролей | открыть папку в дереве — она синхронизируется по клику |
+| Обновления не приходят | `UpdateMode=disabled`, нет `UpdateBaseUrl` | проверить политики и доступность сервера |
+| Политика не применяется | неверное имя значения/ветка | `Test-Policy.ps1`, проверить `reg query` |
+
+## 10. Миграция с Thunderbird
+
+Автоматического импорта профиля Thunderbird в MVP нет.
+
+1. Установите Kurier рядом с Thunderbird.
+2. Добавьте ящики (при настроенной автонастройке — только адрес и пароль).
+3. Дождитесь синхронизации заголовков; тела загружаются по мере открытия.
+4. Локальные папки Thunderbird (`Local Folders`) не переносятся — при необходимости
+   загрузите их на сервер через IMAP до миграции.
+5. Адресную книгу можно экспортировать в LDIF/CSV, но импорт в Kurier пока не реализован.
+
+## 11. Чек-лист внедрения
+
+- [ ] Собран и подписан установщик, опубликован сервер обновлений.
+- [ ] Установлены ADMX/ADML в Central Store.
+- [ ] Создана и привязана GPO с `AutoconfigUrl`, `UpdateMode`, `BlockRemoteContent`.
+- [ ] Проверены OAuth client_id (если нужны Gmail/Яндекс).
+- [ ] Пилот на 5–10 пользователях: установка, вход, отправка, вложения, офлайн.
+- [ ] Проверено обновление с 0.1.0 на 0.1.1 (blockmap, без UAC).
+- [ ] Настроен сбор логов и известно, куда обращаться при сбое.
+- [ ] Массовое развёртывание через SCCM/Intune или GPO-скрипт.

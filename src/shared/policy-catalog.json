@@ -1,0 +1,330 @@
+{
+  "version": 1,
+  "rootKey": "SOFTWARE\\Policies\\Kurier",
+  "valuePrefix": "Kurier",
+  "categories": [
+    {
+      "name": "Kurier",
+      "displayName": { "en": "Kurier Mail", "ru": "Kurier Почта" }
+    },
+    {
+      "name": "Kurier\\Accounts",
+      "displayName": { "en": "Accounts and servers", "ru": "Учётные записи и серверы" },
+      "parent": "Kurier"
+    },
+    {
+      "name": "Kurier\\Updates",
+      "displayName": { "en": "Updates", "ru": "Обновления" },
+      "parent": "Kurier"
+    },
+    {
+      "name": "Kurier\\Security",
+      "displayName": { "en": "Security and content", "ru": "Безопасность и контент" },
+      "parent": "Kurier"
+    },
+    {
+      "name": "Kurier\\Storage",
+      "displayName": { "en": "Cache and storage", "ru": "Кеш и хранилище" },
+      "parent": "Kurier"
+    },
+    {
+      "name": "Kurier\\Interface",
+      "displayName": { "en": "Interface", "ru": "Интерфейс" },
+      "parent": "Kurier"
+    },
+    {
+      "name": "Kurier\\Diagnostics",
+      "displayName": { "en": "Diagnostics", "ru": "Диагностика" },
+      "parent": "Kurier"
+    }
+  ],
+  "policies": [
+    {
+      "key": "autoconfigUrl",
+      "registryName": "AutoconfigUrl",
+      "type": "string",
+      "category": "Kurier\\Accounts",
+      "default": "",
+      "title": {
+        "en": "Intranet autoconfiguration URL",
+        "ru": "URL автонастройки во внутренней сети"
+      },
+      "description": {
+        "en": "Base URL of Thunderbird-style autoconfig XML (for example https://autoconfig.example.com/mail/config-v1.1.xml?emailaddress=%EMAIL%). The client queries it before public sources.",
+        "ru": "Базовый URL автонастройки в формате Thunderbird (например https://autoconfig.example.com/mail/config-v1.1.xml?emailaddress=%EMAIL%). Клиент обращается к нему раньше публичных источников."
+      }
+    },
+    {
+      "key": "preconfiguredAccounts",
+      "registryName": "PreconfiguredAccounts",
+      "type": "string",
+      "category": "Kurier\\Accounts",
+      "default": "",
+      "title": {
+        "en": "Preconfigured accounts (JSON)",
+        "ru": "Предустановленные учётные записи (JSON)"
+      },
+      "description": {
+        "en": "JSON array of account templates offered during onboarding. Passwords never stored in policy: users enter them once.",
+        "ru": "JSON-массив шаблонов учётных записей, предлагаемых при первом запуске. Пароли в политике не хранятся: пользователь вводит их один раз."
+      }
+    },
+    {
+      "key": "allowAccountManagement",
+      "registryName": "AllowAccountManagement",
+      "type": "boolean",
+      "category": "Kurier\\Accounts",
+      "default": true,
+      "title": {
+        "en": "Allow users to add and edit accounts",
+        "ru": "Разрешить пользователям добавлять и изменять учётные записи"
+      },
+      "description": {
+        "en": "When disabled, the account list is fixed by policy and the account editor is hidden.",
+        "ru": "Если отключено, список учётных записей фиксируется политикой, а редактор скрывается."
+      }
+    },
+    {
+      "key": "allowOAuth",
+      "registryName": "AllowOAuth",
+      "type": "boolean",
+      "category": "Kurier\\Accounts",
+      "default": true,
+      "title": { "en": "Allow OAuth2 sign-in", "ru": "Разрешить вход через OAuth2" },
+      "description": {
+        "en": "Enables OAuth2 for Gmail and Yandex when client IDs are configured.",
+        "ru": "Включает OAuth2 для Gmail и Яндекс, если настроены client_id."
+      }
+    },
+    {
+      "key": "googleClientId",
+      "registryName": "GoogleClientId",
+      "type": "string",
+      "category": "Kurier\\Accounts",
+      "default": "",
+      "title": { "en": "Google OAuth client ID", "ru": "Google OAuth client ID" },
+      "description": {
+        "en": "OAuth client ID of the company application registered in Google Cloud (Desktop app type).",
+        "ru": "Client ID корпоративного приложения, зарегистрированного в Google Cloud (тип Desktop app)."
+      }
+    },
+    {
+      "key": "yandexClientId",
+      "registryName": "YandexClientId",
+      "type": "string",
+      "category": "Kurier\\Accounts",
+      "default": "",
+      "title": { "en": "Yandex OAuth client ID", "ru": "Yandex OAuth client ID" },
+      "description": {
+        "en": "OAuth client ID of the application registered in Yandex ID.",
+        "ru": "Client ID приложения, зарегистрированного в Яндекс ID."
+      }
+    },
+    {
+      "key": "updateMode",
+      "registryName": "UpdateMode",
+      "type": "enum",
+      "category": "Kurier\\Updates",
+      "default": "auto",
+      "enum": ["auto", "notify", "disabled"],
+      "title": { "en": "Update mode", "ru": "Режим обновлений" },
+      "description": {
+        "en": "auto — download and install silently on exit; notify — download and ask the user; disabled — no update checks.",
+        "ru": "auto — скачивать и устанавливать тихо при выходе; notify — скачивать и спрашивать пользователя; disabled — не проверять обновления."
+      }
+    },
+    {
+      "key": "updateChannel",
+      "registryName": "UpdateChannel",
+      "type": "enum",
+      "category": "Kurier\\Updates",
+      "default": "stable",
+      "enum": ["stable", "beta", "internal"],
+      "title": { "en": "Update channel", "ru": "Канал обновлений" },
+      "description": {
+        "en": "Which release channel the client follows.",
+        "ru": "Канал выпусков, за которым следует клиент."
+      }
+    },
+    {
+      "key": "updateBaseUrl",
+      "registryName": "UpdateBaseUrl",
+      "type": "string",
+      "category": "Kurier\\Updates",
+      "default": "",
+      "title": { "en": "Update server URL", "ru": "URL сервера обновлений" },
+      "description": {
+        "en": "Overrides the built-in update feed (generic provider). Leave empty to use the default feed.",
+        "ru": "Переопределяет встроенный источник обновлений (generic provider). Пусто — использовать источник по умолчанию."
+      }
+    },
+    {
+      "key": "updateCheckIntervalHours",
+      "registryName": "UpdateCheckIntervalHours",
+      "type": "number",
+      "category": "Kurier\\Updates",
+      "default": 6,
+      "min": 1,
+      "max": 168,
+      "title": { "en": "Update check interval, hours", "ru": "Интервал проверки обновлений, часы" },
+      "description": {
+        "en": "How often the client checks for updates. Minimal 1 hour, maximal 168 hours (7 days).",
+        "ru": "Как часто клиент проверяет обновления. Минимум 1 час, максимум 168 часов (7 дней)."
+      }
+    },
+    {
+      "key": "updateDeferDays",
+      "registryName": "UpdateDeferDays",
+      "type": "number",
+      "category": "Kurier\\Updates",
+      "default": 0,
+      "min": 0,
+      "max": 30,
+      "title": { "en": "Defer updates, days", "ru": "Отсрочка обновлений, дни" },
+      "description": {
+        "en": "Delay installation of a new version for the specified number of days. 0 — install immediately.",
+        "ru": "Задерживать установку новой версии на указанное число дней. 0 — устанавливать сразу."
+      }
+    },
+    {
+      "key": "blockRemoteContent",
+      "registryName": "BlockRemoteContent",
+      "type": "boolean",
+      "category": "Kurier\\Security",
+      "default": true,
+      "title": { "en": "Block remote content in messages", "ru": "Блокировать внешний контент в письмах" },
+      "description": {
+        "en": "Blocks images, styles and tracking pixels loaded from the internet until the user allows them.",
+        "ru": "Блокирует картинки, стили и трекинг-пиксели из интернета до явного разрешения пользователя."
+      }
+    },
+    {
+      "key": "allowHtmlMail",
+      "registryName": "AllowHtmlMail",
+      "type": "boolean",
+      "category": "Kurier\\Security",
+      "default": true,
+      "title": { "en": "Render HTML messages", "ru": "Отображать HTML-письма" },
+      "description": {
+        "en": "When disabled, only the plain-text part is shown.",
+        "ru": "Если отключено, показывается только текстовая часть письма."
+      }
+    },
+    {
+      "key": "blockedAttachmentExtensions",
+      "registryName": "BlockedAttachmentExtensions",
+      "type": "multistring",
+      "category": "Kurier\\Security",
+      "default": "exe,dll,scr,bat,cmd,ps1,vbs,vbe,js,jse,wsf,wsh,msi,com,pif,hta,cpl,jar,lnk,reg",
+      "title": { "en": "Blocked attachment extensions", "ru": "Заблокированные расширения вложений" },
+      "description": {
+        "en": "Comma-separated list of extensions that cannot be opened or saved from messages.",
+        "ru": "Список расширений через запятую, которые нельзя открыть или сохранить из письма."
+      }
+    },
+    {
+      "key": "requireTls",
+      "registryName": "RequireTls",
+      "type": "boolean",
+      "category": "Kurier\\Security",
+      "default": true,
+      "title": { "en": "Require encrypted connections", "ru": "Требовать шифрованные соединения" },
+      "description": {
+        "en": "Forbids plain-text IMAP/SMTP connections; accounts with security=none are rejected.",
+        "ru": "Запрещает незашифрованные подключения IMAP/SMTP; учётные записи с security=none отклоняются."
+      }
+    },
+    {
+      "key": "maxCacheSizeMb",
+      "registryName": "MaxCacheSizeMb",
+      "type": "number",
+      "category": "Kurier\\Storage",
+      "default": 4096,
+      "min": 256,
+      "max": 65536,
+      "title": { "en": "Maximum local cache, MB", "ru": "Максимальный размер кеша, МБ" },
+      "description": {
+        "en": "Soft limit for the local message cache; oldest bodies are evicted first.",
+        "ru": "Мягкий лимит локального кеша писем; первыми вытесняются самые старые тела писем."
+      }
+    },
+    {
+      "key": "cacheRetentionDays",
+      "registryName": "CacheRetentionDays",
+      "type": "number",
+      "category": "Kurier\\Storage",
+      "default": 365,
+      "min": 30,
+      "max": 3650,
+      "title": { "en": "Keep message headers, days", "ru": "Хранить заголовки писем, дни" },
+      "description": {
+        "en": "Headers older than this are removed from the local cache; messages stay on the server.",
+        "ru": "Заголовки старше указанного срока удаляются из локального кеша; письма остаются на сервере."
+      }
+    },
+    {
+      "key": "syncIntervalMinutes",
+      "registryName": "SyncIntervalMinutes",
+      "type": "number",
+      "category": "Kurier\\Storage",
+      "default": 5,
+      "min": 1,
+      "max": 120,
+      "title": { "en": "Background sync interval, minutes", "ru": "Интервал фоновой синхронизации, минуты" },
+      "description": {
+        "en": "Fallback polling interval when IMAP IDLE is unavailable.",
+        "ru": "Резервный интервал опроса, если IMAP IDLE недоступен."
+      }
+    },
+    {
+      "key": "defaultLanguage",
+      "registryName": "DefaultLanguage",
+      "type": "enum",
+      "category": "Kurier\\Interface",
+      "default": "auto",
+      "enum": ["auto", "ru", "en"],
+      "title": { "en": "Interface language", "ru": "Язык интерфейса" },
+      "description": {
+        "en": "auto — follow the Windows display language.",
+        "ru": "auto — использовать язык Windows."
+      }
+    },
+    {
+      "key": "showPolicyBanner",
+      "registryName": "ShowPolicyBanner",
+      "type": "boolean",
+      "category": "Kurier\\Interface",
+      "default": true,
+      "title": { "en": "Show managed-by-organization banner", "ru": "Показывать баннер «управляется организацией»" },
+      "description": {
+        "en": "Shows a small notice when at least one setting is managed by group policy.",
+        "ru": "Показывает уведомление, если хотя бы одна настройка управляется групповой политикой."
+      }
+    },
+    {
+      "key": "logLevel",
+      "registryName": "LogLevel",
+      "type": "enum",
+      "category": "Kurier\\Diagnostics",
+      "default": "warn",
+      "enum": ["error", "warn", "info", "debug"],
+      "title": { "en": "Log level", "ru": "Уровень логирования" },
+      "description": {
+        "en": "Verbosity of local logs. Logs never contain passwords or message bodies.",
+        "ru": "Подробность локальных логов. Логи не содержат паролей и тел писем."
+      }
+    },
+    {
+      "key": "telemetryEnabled",
+      "registryName": "TelemetryEnabled",
+      "type": "boolean",
+      "category": "Kurier\\Diagnostics",
+      "default": false,
+      "title": { "en": "Allow diagnostics telemetry", "ru": "Разрешить телеметрию диагностики" },
+      "description": {
+        "en": "Sends anonymous crash and performance counters to the configured endpoint. Disabled by default.",
+        "ru": "Отправляет анонимные счётчики сбоев и производительности на настроенный сервер. По умолчанию выключено."
+      }
+    }
+  ]
+}

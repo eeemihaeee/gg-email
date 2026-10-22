@@ -1,0 +1,22 @@
+{
+  "values": {
+    "AutoconfigUrl": "https://autoconfig.company.ru/mail/config-v1.1.xml?emailaddress=%EMAIL%",
+    "AllowAccountManagement": true,
+    "AllowOAuth": true,
+    "UpdateMode": "notify",
+    "UpdateChannel": "beta",
+    "UpdateCheckIntervalHours": 12,
+    "UpdateDeferDays": 3,
+    "BlockRemoteContent": true,
+    "AllowHtmlMail": true,
+    "BlockedAttachmentExtensions": "exe,dll,scr,bat,cmd,ps1,vbs,js,msi,lnk",
+    "RequireTls": true,
+    "MaxCacheSizeMb": 2048,
+    "CacheRetentionDays": 180,
+    "SyncIntervalMinutes": 10,
+    "DefaultLanguage": "ru",
+    "ShowPolicyBanner": true,
+    "LogLevel": "debug",
+    "TelemetryEnabled": false
+  }
+}
