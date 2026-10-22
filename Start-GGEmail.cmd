@@ -31,5 +31,10 @@ timeout /t 3 /nobreak >nul
 
 :open
 popd
-start "" "%URL%"
+set "EDGE=%ProgramFiles(x86)%\Microsoft\Edge\Application\msedge.exe"
+if exist "%EDGE%" (
+  start "" "%EDGE%" --app="%URL%" --window-size=1400,900
+) else (
+  start "" "%URL%"
+)
 exit /b 0
