@@ -13,16 +13,14 @@ static class Program
     private const string Token = "gg-email-local";
     private const string Url = "http://127.0.0.1:4173/?token=gg-email-local";
 
-    private static readonly string LogPath = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        @"GG Email Web\launcher.log");
+    private static string _logPath = Path.Combine(
+        Path.GetTempPath(), "gg-email-launcher.log");
 
     private static void Log(string message)
     {
         try
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(LogPath));
-            File.AppendAllText(LogPath,
+            File.AppendAllText(_logPath,
                 DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "  " + message + Environment.NewLine);
         }
         catch
@@ -34,6 +32,22 @@ static class Program
     [STAThread]
     private static void Main()
     {
+        try
+        {
+            Run();
+        }
+        catch (Exception error)
+        {
+            Log("FATAL: " + error);
+            MessageBox.Show(
+                "GG Email не смог запуститься:\n" + error.Message +
+                "\n\nЛог: " + _logPath,
+                "GG Email", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+    }
+
+    private static void Run()
+    {
         string baseDir = AppDomain.CurrentDomain.BaseDirectory;
         Log("start baseDir=" + baseDir);
 
@@ -42,9 +56,9 @@ static class Program
         Log("server=" + server + " exists=" + File.Exists(server));
         if (!File.Exists(server))
         {
-            Log("server not found");
             MessageBox.Show(
-                "Не найден файл сервера (out\\web\\server.cjs).\nСоберите проект: npm install && npm run build:web",
+                "Не найден файл сервера (out\\web\\server.cjs).\n" +
+                "Запускайте GG Email.exe из папки GG-Email-Web, не переносите его отдельно.",
                 "GG Email", MessageBoxButtons.OK, MessageBoxIcon.Error);
             return;
         }
@@ -54,20 +68,29 @@ static class Program
         if (node == null)
         {
             MessageBox.Show(
-                "Не найден Node.js 22+.\nУстановите Node.js или используйте установщик GG Email.",
+                "Не найден Node.js 22+.\nУстановите Node.js или используйте папку GG-Email-Web с вложенным node\\node.exe.",
                 "GG Email", MessageBoxButtons.OK, MessageBoxIcon.Error);
             return;
         }
 
-        string profile = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "GG Email Web");
-        Directory.CreateDirectory(profile);
+        string profile = EnsureProfile(baseDir);
+        Log("profile=" + (profile ?? "null"));
+        if (profile == null)
+        {
+            MessageBox.Show(
+                "Не удалось создать папку профиля ни в одном месте (LocalAppData, AppData, Temp, папка программы).\n" +
+                "Проверьте права на запись.",
+                "GG Email", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return;
+        }
+        _logPath = Path.Combine(profile, "launcher.log");
+        Log("profile selected: " + profile);
+
         MigrateProfile(baseDir, profile);
 
         if (!PortOpen())
         {
-            Log("starting server, profile=" + profile);
+            Log("starting server");
             StartServer(node, server, baseDir, profile);
         }
         else
@@ -80,7 +103,8 @@ static class Program
         if (!ready)
         {
             MessageBox.Show(
-                "Локальный сервер GG Email не запустился за 25 секунд.\nПроверьте, что порт 4173 свободен, и запустите ещё раз.",
+                "Локальный сервер GG Email не запустился за 25 секунд.\n" +
+                "Проверьте, что порт 4173 свободен, и запустите ещё раз.\nЛог: " + _logPath,
                 "GG Email", MessageBoxButtons.OK, MessageBoxIcon.Error);
             return;
         }
@@ -93,6 +117,35 @@ static class Program
 
         Log("opening window");
         OpenWindow();
+    }
+
+    /// <summary>Ищет папку профиля, в которую реально можно писать.</summary>
+    private static string EnsureProfile(string baseDir)
+    {
+        string[] candidates =
+        {
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "GG Email Web"),
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "GG Email Web"),
+            Path.Combine(Path.GetTempPath(), "GG Email Web"),
+            Path.Combine(baseDir, ".profile")
+        };
+
+        foreach (string candidate in candidates)
+        {
+            try
+            {
+                Directory.CreateDirectory(candidate);
+                string probe = Path.Combine(candidate, "write-test.tmp");
+                File.WriteAllText(probe, "ok");
+                File.Delete(probe);
+                return candidate;
+            }
+            catch (Exception error)
+            {
+                Log("profile candidate failed: " + candidate + " — " + error.Message);
+            }
+        }
+        return null;
     }
 
     private static string FindNode(string baseDir)
