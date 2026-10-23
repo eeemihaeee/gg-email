@@ -34,6 +34,8 @@ export type IconName =
   | 'trash-empty'
   | 'info'
   | 'palette'
+  | 'printer'
+  | 'cloud'
 
 const PATHS: Record<IconName, string> = {
   inbox: 'M3 7.5 5.2 4h13.6L21 7.5V18a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7.5Zm0 0h5l1.5 2.5h5L16 7.5h5',
@@ -71,7 +73,11 @@ const PATHS: Record<IconName, string> = {
   'trash-empty': 'M4 7h16M9 7V4h6v3M6 7l1 14h10l1-14M10 11v6m4-6v6',
   info: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0-13h.01M12 11v6',
   palette:
-    'M12 3a9 9 0 0 0 0 18h1.6a1.9 1.9 0 0 0 1.4-3.2 1.9 1.9 0 0 1 1.4-3.2H19a3 3 0 0 0 3-3A9 9 0 0 0 12 3Zm-4 9h.01M9.5 7.5h.01M14.5 7.5h.01M17 11h.01'
+    'M12 3a9 9 0 0 0 0 18h1.6a1.9 1.9 0 0 0 1.4-3.2 1.9 1.9 0 0 1 1.4-3.2H19a3 3 0 0 0 3-3A9 9 0 0 0 12 3Zm-4 9h.01M9.5 7.5h.01M14.5 7.5h.01M17 11h.01',
+  printer:
+    'M7 9V4h10v5M7 17H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2M7 14h10v7H7v-7Z',
+  cloud:
+    'M7 18a4 4 0 0 1-.6-7.96A6 6 0 0 1 18 9.5a4.5 4.5 0 0 1 .5 8.98M12 12v6m0 0 3-3m-3 3-3-3'
 }
 
 interface IconProps extends SVGProps<SVGSVGElement> {

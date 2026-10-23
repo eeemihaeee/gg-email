@@ -1,9 +1,11 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useStore } from '../store'
 import { Icon } from './Icon'
 import { formatFullDate, formatSize, senderLabel } from '../lib/format'
 import { buildMessageDocument, buildTextDocument } from '../lib/sanitize'
 import { isBlockedAttachment } from '@shared/policy'
+import type { AttachmentMeta } from '@shared/types'
+import AttachmentViewer from './AttachmentViewer'
 
 export default function Reader(): React.JSX.Element | null {
   const detail = useStore((state) => state.detail)
@@ -15,6 +17,7 @@ export default function Reader(): React.JSX.Element | null {
   const startCompose = useStore((state) => state.startCompose)
   const policy = useStore((state) => state.policy)
   const closeMessage = useStore((state) => state.closeMessage)
+  const [viewing, setViewing] = useState<AttachmentMeta | null>(null)
 
   const allowRemote =
     detail !== null
@@ -37,6 +40,24 @@ export default function Reader(): React.JSX.Element | null {
     }
     return buildTextDocument(detail.textBody || '(письмо без текста)')
   }, [detail, allowRemote, allowHtml])
+
+  /** Печать через системный диалог: пользователь выбирает принтер. */
+  const printMessage = (): void => {
+    if (!detail) return
+    const frame = window.document.createElement('iframe')
+    frame.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0'
+    window.document.body.appendChild(frame)
+    const doc = frame.contentDocument
+    if (!doc) return
+    doc.open()
+    doc.write(document)
+    doc.close()
+    frame.onload = () => {
+      frame.contentWindow?.focus()
+      frame.contentWindow?.print()
+      setTimeout(() => frame.remove(), 60_000)
+    }
+  }
 
   if (loading && !detail) {
     return (
@@ -93,6 +114,9 @@ export default function Reader(): React.JSX.Element | null {
           </button>
           <button className="icon-btn" title="Удалить (Del)" onClick={() => void deleteMessage(detail.id)}>
             <Icon name="trash" size={17} />
+          </button>
+          <button className="icon-btn" title="Печать" onClick={printMessage}>
+            <Icon name="printer" size={17} />
           </button>
           <span className="flex-spacer" />
           <button className="icon-btn" title="Закрыть (Esc)" onClick={closeMessage}>
@@ -156,9 +180,7 @@ export default function Reader(): React.JSX.Element | null {
                 }
                 disabled={blocked}
                 onClick={() => {
-                  void window.kurier.messages.openAttachment(attachment.id).catch((error: Error) => {
-                    useStore.getState().pushToast('error', error.message)
-                  })
+                  if (!blocked) setViewing(attachment)
                 }}
               >
                 <Icon name={blocked ? 'lock' : 'paperclip'} size={15} />
@@ -173,6 +195,8 @@ export default function Reader(): React.JSX.Element | null {
           })}
         </div>
       )}
+
+      {viewing && <AttachmentViewer attachment={viewing} onClose={() => setViewing(null)} />}
     </section>
   )
 }

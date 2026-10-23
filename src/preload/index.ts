@@ -14,6 +14,7 @@ import type {
   AppInfo,
   AutoconfigResult,
   BootstrapState,
+  CacheStats,
   DraftPayload,
   Folder,
   FolderRole,
@@ -67,7 +68,9 @@ const api: KurierApi = {
     openAttachment: (id: string) =>
       ipcRenderer.invoke(CHANNELS.messageOpenAttachment, id) as Promise<void>,
     saveAttachment: (id: string) =>
-      ipcRenderer.invoke(CHANNELS.messageSaveAttachment, id) as Promise<string | null>
+      ipcRenderer.invoke(CHANNELS.messageSaveAttachment, id) as Promise<string | null>,
+    attachmentUrl: (id: string) =>
+      ipcRenderer.invoke(CHANNELS.messageAttachmentUrl, id) as Promise<string>
   },
   composer: {
     send: (draft: DraftPayload) =>
@@ -97,7 +100,9 @@ const api: KurierApi = {
     openDataFolder: () => ipcRenderer.invoke(CHANNELS.appOpenData) as Promise<void>,
     openExternal: (url: string) =>
       ipcRenderer.invoke(CHANNELS.appOpenExternal, url) as Promise<void>,
-    clearCache: () => ipcRenderer.invoke(CHANNELS.appClearCache) as Promise<void>
+    clearCache: () => ipcRenderer.invoke(CHANNELS.appClearCache) as Promise<void>,
+    clearBodies: () => ipcRenderer.invoke(CHANNELS.appClearBodies) as Promise<void>,
+    cacheStats: () => ipcRenderer.invoke(CHANNELS.appCacheStats) as Promise<CacheStats>
   },
   oauth: {
     start: (provider: 'google' | 'yandex', email?: string) =>

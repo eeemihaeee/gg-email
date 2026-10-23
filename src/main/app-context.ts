@@ -1,5 +1,7 @@
 import { app, BrowserWindow, shell } from 'electron'
-import type { Account, PolicyState, SyncStatus } from '@shared/types'
+import { readdirSync, statSync } from 'node:fs'
+import { join } from 'node:path'
+import type { Account, CacheStats, PolicyState, SyncStatus } from '@shared/types'
 import { policyValue } from '@shared/policy'
 import { EVENTS, type ToastEvent, type ChangesEvent } from '@shared/ipc'
 import { Database } from './db/database'
@@ -206,6 +208,37 @@ export class AppContext {
     await this.handlePolicyChange(next)
   }
 
+
+  cacheStats(): CacheStats {
+    const dbBytes = statSync(paths.db).size
+    const attachmentsBytes = directorySize(paths.attachments)
+    const bodyBytes = this.messages.bodyBytes()
+    const messages = this.db.get<{ n: number }>('SELECT COUNT(*) AS n FROM messages')?.n ?? 0
+    const accounts = this.db.get<{ n: number }>('SELECT COUNT(*) AS n FROM accounts')?.n ?? 0
+    const oldest = this.db.get<{ at: number | null }>(
+      'SELECT MIN(body_fetched_at) AS at FROM messages WHERE body_state = 1'
+    )
+    return {
+      dbBytes,
+      bodyBytes,
+      attachmentsBytes,
+      totalBytes: dbBytes + attachmentsBytes,
+      messages,
+      accounts,
+      oldestBodyAt: oldest?.at ?? null
+    }
+  }
+
+  /** Удаляет тела писем и сжимает базу, не трогая заголовки и аккаунты. */
+  clearBodies(): number {
+    const removed = this.messages.evictAllBodies()
+    this.db.exec('PRAGMA wal_checkpoint(TRUNCATE); VACUUM;')
+    this.toast({
+      kind: 'success',
+      message: `Тела писем удалены (${removed}), база сжата. Заголовки и аккаунты сохранены.`
+    })
+    return removed
+  }
   async openExternal(url: string): Promise<void> {
     if (!/^https?:\/\//i.test(url)) throw new Error('Разрешены только http(s)-ссылки')
     await shell.openExternal(url)
@@ -242,5 +275,19 @@ export class AppContext {
       fts: context.db.fts5
     })
     return context
+  }
+}
+
+function directorySize(path: string): number {
+  try {
+    let total = 0
+    for (const entry of readdirSync(path, { withFileTypes: true })) {
+      const full = join(path, entry.name)
+      if (entry.isDirectory()) total += directorySize(full)
+      else total += statSync(full).size
+    }
+    return total
+  } catch {
+    return 0
   }
 }

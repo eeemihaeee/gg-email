@@ -1608,3 +1608,184 @@ kbd {
   font-size: 18px;
   margin: 0;
 }
+
+
+/* ---------------------------------------------------------- сферы ящиков */
+
+.titlebar-search {
+  max-width: 420px;
+}
+
+.account-switcher {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 2px;
+}
+
+.account-sphere {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  color: var(--sphere-color, var(--text-dim));
+  background: color-mix(in srgb, var(--sphere-color, #999) 13%, #ffffff);
+  border: 1.5px solid transparent;
+  transition: border-color 0.14s ease, box-shadow 0.14s ease, transform 0.1s ease;
+}
+
+.account-sphere:hover {
+  border-color: var(--sphere-color, var(--border));
+  transform: translateY(-1px);
+}
+
+.account-sphere.active {
+  border-color: var(--sphere-color, var(--accent));
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--sphere-color, #999) 22%, transparent);
+}
+
+.account-sphere.add {
+  background: transparent;
+  border: 1px dashed var(--border);
+  color: var(--text-faint);
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.account-sphere.add:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.sphere-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 15px;
+  height: 15px;
+  padding: 0 3px;
+  border-radius: 8px;
+  background: var(--accent-strong);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 600;
+  display: grid;
+  place-items: center;
+  border: 1.5px solid var(--bg-elev);
+}
+
+/* ---------------------------------------------------------- просмотр вложений */
+
+.attachment-viewer {
+  width: min(1040px, 94vw);
+  height: min(840px, 90vh);
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.attachment-viewer-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-soft);
+  flex: none;
+}
+
+.attachment-viewer-title {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.attachment-viewer-title strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.attachment-viewer-body {
+  flex: 1;
+  min-height: 0;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+  background: var(--bg);
+}
+
+.attachment-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+.attachment-pdf {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.attachment-text {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 16px;
+  overflow: auto;
+  background: #fff;
+  color: #171717;
+  border-radius: 8px;
+  font: 12.5px/1.55 var(--mono);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.attachment-unknown {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-dim);
+}
+
+/* ---------------------------------------------------------- хранилище */
+
+.storage-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.storage-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  background: var(--bg-elev2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.storage-card span {
+  color: var(--text-dim);
+  font-size: 12px;
+}
+
+.storage-card strong {
+  font-size: 17px;
+  font-variant-numeric: tabular-nums;
+}

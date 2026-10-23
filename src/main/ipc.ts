@@ -15,6 +15,7 @@ import type {
   MessageFlags,
   MessagePage,
   MessageQuery,
+  CacheStats,
   PolicyState,
   UpdaterState
 } from '@shared/types'
@@ -256,6 +257,12 @@ export function createApiHandlers(
     return result.filePath
   })
 
+  /** URL для показа вложения внутри приложения (без внешнего браузера). */
+  handle<string>(CHANNELS.messageAttachmentUrl, (_event, id: string) => {
+    if (!ctx.messages.attachment(id)) throw new Error('Вложение не найдено в кеше')
+    return `kurier-att://attachment/${encodeURIComponent(id)}`
+  })
+
   // ------------------------------------------------------------------ отправка
   handle(CHANNELS.composerSend, async (_event, draft: DraftPayload) => {
     const account = ctx.accounts.get(draft.accountId)
@@ -328,6 +335,12 @@ export function createApiHandlers(
 
   handle<void>(CHANNELS.appClearCache, async () => {
     await ctx.clearCache()
+  })
+
+  handle<CacheStats>(CHANNELS.appCacheStats, () => ctx.cacheStats())
+
+  handle<void>(CHANNELS.appClearBodies, () => {
+    ctx.clearBodies()
   })
 
   handle(CHANNELS.oauthStart, async (_event, provider: 'google' | 'yandex', email?: string) => {

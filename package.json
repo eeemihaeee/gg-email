@@ -1,7 +1,7 @@
 {
   "name": "gg-email",
   "productName": "GG Email",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "GG Email — почтовый клиент для Windows и браузера",
   "author": {
     "name": "GG Email Team",
@@ -25,7 +25,8 @@
     "test:watch": "vitest",
     "admx": "node tools/gen-admx.mjs",
     "dist": "npm run build && electron-builder --win nsis --x64",
-    "dist:dir": "npm run build && electron-builder --win dir --x64"
+    "dist:dir": "npm run build && electron-builder --win dir --x64",
+    "dist:publish": "npm run build && electron-builder --win nsis --x64 --publish always"
   },
   "dependencies": {
     "@tanstack/react-virtual": "^3.14.22",

@@ -6,6 +6,7 @@ import type {
   AppInfo,
   AutoconfigResult,
   BootstrapState,
+  CacheStats,
   DraftPayload,
   Folder,
   FolderRole,
@@ -117,7 +118,8 @@ export function installWebApi(boot: WebBoot): void {
         link.click()
         link.remove()
         return null
-      }
+      },
+      attachmentUrl: async (id: string) => attachmentUrl(id, true)
     },
     composer: {
       send: (draft: DraftPayload) => call<SendResult>(CHANNELS.composerSend, draft)
@@ -143,7 +145,9 @@ export function installWebApi(boot: WebBoot): void {
       info: () => call<AppInfo>(CHANNELS.appInfo),
       openDataFolder: () => call<void>(CHANNELS.appOpenData),
       openExternal: (url: string) => call<void>(CHANNELS.appOpenExternal, url),
-      clearCache: () => call<void>(CHANNELS.appClearCache)
+      clearCache: () => call<void>(CHANNELS.appClearCache),
+      clearBodies: () => call<void>(CHANNELS.appClearBodies),
+      cacheStats: () => call<CacheStats>(CHANNELS.appCacheStats)
     },
     oauth: {
       start: (provider, email) =>

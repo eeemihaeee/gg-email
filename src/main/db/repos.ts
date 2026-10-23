@@ -721,6 +721,12 @@ export class MessagesRepo {
     return result.changes
   }
 
+  /** Удаляет все тела писем (заголовки остаются). */
+  evictAllBodies(): number {
+    return this.db.run(
+      'UPDATE messages SET text_gz = NULL, html_gz = NULL, body_state = 0, body_fetched_at = NULL WHERE body_state = 1'
+    ).changes
+  }
   /** Приблизительный размер кеша тел писем в байтах. */
   bodyBytes(): number {
     const row = this.db.get<{ bytes: number }>(

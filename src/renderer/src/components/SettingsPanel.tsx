@@ -1,9 +1,11 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useStore } from '../store'
 import { Icon } from './Icon'
 import { POLICY_DEFINITIONS } from '@shared/policy'
+import type { CacheStats } from '@shared/types'
+import { formatSize } from '../lib/format'
 
-type Tab = 'accounts' | 'appearance' | 'security' | 'updates' | 'about'
+type Tab = 'accounts' | 'appearance' | 'security' | 'storage' | 'updates' | 'about'
 
 function formatPolicyValue(value: unknown): string {
   if (Array.isArray(value)) return value.join(', ')
@@ -15,7 +17,7 @@ function formatPolicyValue(value: unknown): string {
 export default function SettingsPanel(): React.JSX.Element {
   const [tab, setTab] = useState<Tab>(() => {
     const requested = new URLSearchParams(window.location.search).get('tab')
-    const allowed: Tab[] = ['accounts', 'appearance', 'security', 'updates', 'about']
+    const allowed: Tab[] = ['accounts', 'appearance', 'security', 'storage', 'updates', 'about']
     return allowed.includes(requested as Tab) ? (requested as Tab) : 'accounts'
   })
   const closeOverlay = useStore((state) => state.closeOverlay)
@@ -29,6 +31,18 @@ export default function SettingsPanel(): React.JSX.Element {
   const checkUpdates = useStore((state) => state.checkUpdates)
   const installUpdate = useStore((state) => state.installUpdate)
   const clearCache = useStore((state) => state.clearCache)
+
+  const [stats, setStats] = useState<CacheStats | null>(null)
+  const refreshStats = async (): Promise<void> => {
+    setStats(await window.kurier.app.cacheStats())
+  }
+  const clearBodies = async (): Promise<void> => {
+    await window.kurier.app.clearBodies()
+    await refreshStats()
+  }
+  useEffect(() => {
+    if (tab === 'storage') void refreshStats()
+  }, [tab])
 
   const allowManage = policy.values.allowAccountManagement !== false
 
@@ -63,6 +77,9 @@ export default function SettingsPanel(): React.JSX.Element {
             </button>
             <button className={tab === 'security' ? 'active' : ''} onClick={() => setTab('security')}>
               <Icon name="shield" size={16} /> Политики
+            </button>
+            <button className={tab === 'storage' ? 'active' : ''} onClick={() => setTab('storage')}>
+              <Icon name="cloud" size={16} /> Хранилище
             </button>
             <button className={tab === 'updates' ? 'active' : ''} onClick={() => setTab('updates')}>
               <Icon name="download" size={16} /> Обновления
@@ -206,6 +223,38 @@ export default function SettingsPanel(): React.JSX.Element {
                   и не требуют прав администратора. Администратор управляет каналом, интервалом и
                   отсрочкой через групповые политики.
                 </p>
+              </section>
+            )}
+
+            {tab === 'storage' && (
+              <section>
+                <h2>Кеш и хранилище</h2>
+                <div className="storage-cards">
+                  <div className="storage-card"><span>База данных</span><strong>{formatSize(stats?.dbBytes ?? 0)}</strong></div>
+                  <div className="storage-card"><span>Тела писем</span><strong>{formatSize(stats?.bodyBytes ?? 0)}</strong></div>
+                  <div className="storage-card"><span>Вложения</span><strong>{formatSize(stats?.attachmentsBytes ?? 0)}</strong></div>
+                  <div className="storage-card"><span>Всего</span><strong>{formatSize(stats?.totalBytes ?? 0)}</strong></div>
+                </div>
+                <p className="dim small">
+                  Заголовки писем хранятся всегда, а тела и вложения можно удалить — они загрузятся заново при открытии письма.
+                </p>
+                <div className="policy-table">
+                  <div className="policy-row"><div>Лимит кеша</div><div className="policy-value">{String(policy.values.maxCacheSizeMb ?? '—')} МБ</div></div>
+                  <div className="policy-row"><div>Срок хранения тел</div><div className="policy-value">{String(policy.values.cacheRetentionDays ?? '—')} дн.</div></div>
+                  <div className="policy-row"><div>Писем в кеше</div><div className="policy-value">{stats?.messages ?? 0}</div></div>
+                </div>
+                <div className="button-row">
+                  <button className="btn" onClick={() => void refreshStats()}>Обновить</button>
+                  <button className="btn" onClick={() => void clearBodies()}>Удалить тела писем</button>
+                  <button
+                    className="btn danger"
+                    onClick={() => {
+                      if (window.confirm('Очистить весь кеш? Письма останутся на сервере.')) void clearCache()
+                    }}
+                  >
+                    Очистить весь кеш
+                  </button>
+                </div>
               </section>
             )}
 

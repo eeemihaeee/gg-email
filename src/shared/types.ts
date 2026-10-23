@@ -248,3 +248,14 @@ export type PolicyValue = boolean | string | number | string[]
 
 /** Разрешённый тип значения политики. */
 export type PolicyType = 'boolean' | 'string' | 'enum' | 'number' | 'multistring'
+
+/** Статистика локального кеша для экрана «Хранилище». */
+export interface CacheStats {
+  dbBytes: number
+  bodyBytes: number
+  attachmentsBytes: number
+  totalBytes: number
+  messages: number
+  accounts: number
+  oldestBodyAt: number | null
+}

@@ -340,6 +340,8 @@ const policy: PolicyState = {
     showPolicyBanner: true,
     requireTls: true,
     maxCacheSizeMb: 4096,
+    cacheRetentionDays: 180,
+    syncIntervalMinutes: 5,
     logLevel: 'warn'
   },
   locked: [
@@ -487,7 +489,8 @@ export function installDemoApi(): void {
       },
       loadOlder: async () => 0,
       openAttachment: async () => undefined,
-      saveAttachment: async () => null
+      saveAttachment: async () => null,
+      attachmentUrl: async () => ''
     },
     composer: {
       send: async () => ({ ok: true, messageId: 'demo' })
@@ -532,7 +535,17 @@ export function installDemoApi(): void {
       }),
       openDataFolder: async () => undefined,
       openExternal: async () => undefined,
-      clearCache: async () => undefined
+      clearCache: async () => undefined,
+      clearBodies: async () => undefined,
+      cacheStats: async () => ({
+        dbBytes: 24_500_000,
+        bodyBytes: 12_000_000,
+        attachmentsBytes: 8_400_000,
+        totalBytes: 32_900_000,
+        messages: 207,
+        accounts: 3,
+        oldestBodyAt: Date.now() - 40 * 86_400_000
+      })
     },
     oauth: {
       start: async () => ({ ok: false, error: 'демо-режим' })

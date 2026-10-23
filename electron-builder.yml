@@ -38,6 +38,7 @@ nsis:
   include: build/installer.nsh
 
 publish:
-  provider: generic
-  url: https://updates.example.com/kurier/
-  channel: latest
+  provider: github
+  owner: eeemihaeee
+  repo: gg-email
+  releaseType: release

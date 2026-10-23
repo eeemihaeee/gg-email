@@ -224,18 +224,21 @@ latest.yml ───────────────┘
 Клиент скачивает только разницу (blockmap), проверяет SHA-512, устанавливает
 при выходе. Права администратора не нужны.
 
-### 7.2 Публикация
+### 7.2 Публикация (GitHub Releases)
+
+Обновления публикуются в GitHub-репозиторий `eeemihaeee/gg-email`.
+
+Локально:
 
 ```powershell
-npm run dist
-# выложить на сервер обновлений:
-#   release/GG-Email-Setup-<ver>.exe
-#   release/GG-Email-Setup-<ver>.exe.blockmap
-#   release/latest.yml
+npm run dist:publish      # сборка + публикация релиза (нужен GH_TOKEN)
 ```
 
-`UpdateBaseUrl` в политике указывает на каталог, например
-`https://updates.company.ru/kurier/`. Для канала `beta` публикуйте `beta.yml`.
+В CI релиз создаётся по тегу `v*` (`.github/workflows/build.yml`, используется
+`GITHUB_TOKEN`). Клиент читает `latest.yml` из последнего релиза и скачивает только
+разницу (blockmap).
+
+### 7.2.1 Собственный сервер обновлений (опционально)
 
 ### 7.3 Откат
 

@@ -1,4 +1,5 @@
 import type {
+  CacheStats,
   Account,
   AccountInput,
   AccountTestResult,
@@ -36,6 +37,7 @@ export const CHANNELS = {
   messageLoadOlder: 'messages:load-older',
   messageOpenAttachment: 'messages:open-attachment',
   messageSaveAttachment: 'messages:save-attachment',
+  messageAttachmentUrl: 'messages:attachment-url',
   composerSend: 'composer:send',
   settingsGet: 'settings:get',
   settingsSet: 'settings:set',
@@ -50,6 +52,8 @@ export const CHANNELS = {
   appOpenData: 'app:open-data',
   appOpenExternal: 'app:open-external',
   appClearCache: 'app:clear-cache',
+  appClearBodies: 'app:clear-bodies',
+  appCacheStats: 'app:cache-stats',
   oauthStart: 'oauth:start',
   windowMinimize: 'window:minimize',
   windowMaximize: 'window:maximize',
@@ -112,6 +116,7 @@ export interface KurierApi {
     loadOlder(folderId: string, beforeUid: number): Promise<number>
     openAttachment(id: string): Promise<void>
     saveAttachment(id: string): Promise<string | null>
+    attachmentUrl(id: string): Promise<string>
   }
   composer: {
     send(draft: DraftPayload): Promise<SendResult>
@@ -138,6 +143,8 @@ export interface KurierApi {
     openDataFolder(): Promise<void>
     openExternal(url: string): Promise<void>
     clearCache(): Promise<void>
+    clearBodies(): Promise<void>
+    cacheStats(): Promise<CacheStats>
   }
   oauth: {
     start(provider: 'google' | 'yandex', email?: string): Promise<{ ok: boolean; refreshToken?: string; error?: string }>

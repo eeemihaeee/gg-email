@@ -40,6 +40,7 @@ node node_modules/electron/install.js
 | `npm test` | модульные тесты vitest |
 | `npm run dist` | сборка + NSIS-установщик в `release/` |
 | `npm run web` | веб-режим: сборка серверного бандла и запуск на 127.0.0.1:4173 |
+| `npm run dist:publish` | сборка и публикация релиза в GitHub (нужен `GH_TOKEN`) |
 | `npm run build:web` | только сборка `out/web/server.cjs` |
 | `npm run admx` | генерация ADMX/ADML и справочника политик |
 
