@@ -7,6 +7,7 @@ import { defineConfig } from 'vite'
  * Результат — out/web/server.cjs, который поднимает HTTP+SSE сервер.
  */
 export default defineConfig({
+  ssr: { noExternal: true },
   resolve: {
     alias: [
       { find: /^electron$/, replacement: resolve(__dirname, 'src/web/electron-shim.ts') },
