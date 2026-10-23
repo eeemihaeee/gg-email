@@ -194,7 +194,7 @@ build/             иконка и NSIS-включения
 
 - релиз [v0.3.0](https://github.com/eeemihaeee/gg-email/releases/tag/v0.3.0):
   `GG-Email-Setup-0.3.0.exe` (109,8 МБ, SHA-256
-  `5808B2E49C9B7A80F2AFB0719F2D6C36FFDC40E693C572E083A5B84186470772`),
+  `CEBD5D2C05EE855F60CE4833565BABAB4F5FA88D0888575FD52338860FC47DB9`),
   `latest.yml`, blockmap и ZIP-сборка — автообновление работает через GitHub Releases;
 - `npm test`: 22 модульных теста (политики, роли папок, кеш SQLite, FTS, флаги, сжатие, вытеснение);
 - `npm run typecheck`: main + renderer без ошибок;
