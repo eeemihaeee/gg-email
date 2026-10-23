@@ -1,10 +1,13 @@
-﻿import { app } from 'electron'
+import { app } from 'electron'
 import { autoUpdater, type UpdateInfo } from 'electron-updater'
 import type { PolicyState, UpdaterState } from '@shared/types'
 import { policyValue } from '@shared/policy'
 import { createLogger } from './logger'
 
 const log = createLogger('updater')
+
+const GITHUB_OWNER = 'eeemihaeee'
+const GITHUB_REPO = 'gg-email'
 
 /**
  * РћР±РЅРѕРІР»РµРЅРёСЏ:
@@ -50,9 +53,17 @@ export class UpdateService {
     autoUpdater.channel = policyValue<string>(this.policy, 'updateChannel', 'stable')
     autoUpdater.disableWebInstaller = true
 
-    const baseUrl = policyValue(this.policy, 'updateBaseUrl', '')
+    const baseUrl = policyValue<string>(this.policy, 'updateBaseUrl', '')
     if (typeof baseUrl === 'string' && baseUrl.trim()) {
       autoUpdater.setFeedURL({ provider: 'generic', url: baseUrl.trim() })
+    } else {
+      // Основной канал обновлений — GitHub Releases репозитория gg-email.
+      autoUpdater.setFeedURL({
+        provider: 'github',
+        owner: GITHUB_OWNER,
+        repo: GITHUB_REPO,
+        private: false
+      })
     }
 
     this.wireEvents()
