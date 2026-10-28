@@ -4,6 +4,40 @@
 Пока сертификаты не заданы, CI собирает **неподписанные** артефакты:
 Windows показывает SmartScreen, macOS — «приложение повреждено».
 
+## Гибридная схема: домен + ноутбуки без домена
+
+Клиент для сотрудников, поэтому покупка OV/EV не обязательна. Схема:
+
+1. Сгенерировать внутренний сертификат на машине администратора:
+   ```powershell
+   .\tools\new-signing-cert.ps1 -Organization "Ваша компания"
+   ```
+   Получатся `build/certs/gg-email-root.cer` (CA), `gg-email-codesign.cer`
+   (подпись) и `gg-email-codesign.pfx` (для CI). PFX и пароль — секреты.
+
+2. **Домен**: GPO → Computer Configuration → Policies → Windows Settings →
+   Security Settings → Public Key Policies:
+   - `gg-email-root.cer` → **Trusted Root Certification Authorities**;
+   - `gg-email-codesign.cer` → **Trusted Publishers**.
+
+3. **CI**: секреты `CSC_LINK` (base64 PFX) и `CSC_KEY_PASSWORD`. Workflow
+   подпишет установщик и проверит подпись.
+
+4. **Ноутбуки без домена**: один раз выполнить (без прав администратора):
+   ```powershell
+   .\tools\trust-certificate.ps1 -RootCertificate build\certs\gg-email-root.cer `
+     -PublisherCertificate build\certs\gg-email-codesign.cer
+   ```
+   Сертификаты попадут в `CurrentUser\Root` и `CurrentUser\TrustedPublisher`
+   этого пользователя, и установщик перестанет ругаться. С `-Machine` и правами
+   администратора — для всех пользователей компьютера.
+
+5. Если ноутбуки вообще нельзя трогать руками — для них остаётся покупка OV
+   (PFX в CI) или раздача через Intune/MDM с тем же сертификатом.
+
+Ограничение: самоподписанный сертификат доверяют только те машины, куда его
+поставили. Внешним пользователям нужен публичный OV/EV.
+
 ## Если Azure недоступен (Россия)
 
 Azure Trusted Signing требует подписку Azure и организационную identity
