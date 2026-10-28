@@ -210,6 +210,8 @@ export class AccountSyncer {
       await this.discoverFolders()
       await this.syncAll('connect')
       await this.replayPendingOps()
+      // IMAP IDLE: сервер сам присылает новые письма, без ожидания опроса.
+      void client.idle().catch(() => undefined)
     } catch (error) {
       log.error('Ошибка первичной синхронизации', error)
       this.setStatus({ phase: 'error', error: (error as Error).message })

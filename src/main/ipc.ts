@@ -44,6 +44,14 @@ const DEFAULT_SETTINGS: UserSettings = {
 
 const COLORS = ['#f23c30', '#f2994a', '#27ae60', '#2d9cdb', '#9b51e0', '#eb5757']
 
+function brandColor(email: string): string | undefined {
+  const domain = email.split('@')[1]?.toLowerCase() ?? ''
+  if (domain === 'gmail.com' || domain === 'googlemail.com') return '#ea4335'
+  if (domain.startsWith('yandex.') || domain === 'ya.ru') return '#fc3f1d'
+  if (['mail.ru', 'inbox.ru', 'bk.ru', 'list.ru', 'internet.ru'].includes(domain)) return '#005ff9'
+  return undefined
+}
+
 function assertTrusted(event: IpcMainInvokeEvent): void {
   const url = event.senderFrame?.url ?? ''
   const trusted =
@@ -116,7 +124,7 @@ export function createApiHandlers(
     if ((input.authKind ?? 'password') === 'password' && !input.password) {
       throw new Error('Не указан пароль')
     }
-    const color = input.color ?? COLORS[ctx.accounts.list().length % COLORS.length]
+    const color = input.color ?? brandColor(input.email) ?? COLORS[ctx.accounts.list().length % COLORS.length]
     const account = ctx.accounts.add({ ...input, color })
     if (input.password) {
       secrets.set(account.id, input.password, input.authKind ?? 'password')
