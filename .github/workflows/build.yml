@@ -50,6 +50,8 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          # Без сертификата собираем неподписанный артефакт, иначе electron-builder падает.
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
         run: npx electron-builder --mac dmg zip --${{ matrix.arch }} --publish always
 
       - name: Build macOS (pull request, без публикации)
