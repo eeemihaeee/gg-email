@@ -12,6 +12,11 @@
 $ErrorActionPreference = 'Stop'
 New-Item -ItemType Directory -Force $OutDir | Out-Null
 
+# Удаляем прежние сертификаты этой организации, чтобы не плодить цепочки.
+Get-ChildItem Cert:\CurrentUser\My |
+  Where-Object { $_.Subject -like "*O=$Organization*" } |
+  ForEach-Object { Remove-Item "Cert:\CurrentUser\My\$($_.Thumbprint)" -Force -ErrorAction SilentlyContinue }
+
 $root = New-SelfSignedCertificate `
   -Type Custom `
   -Subject "CN=$Organization Internal CA, O=$Organization, C=RU" `
@@ -20,7 +25,7 @@ $root = New-SelfSignedCertificate `
   -KeyAlgorithm RSA -KeyLength 4096 -HashAlgorithm SHA256 `
   -CertStoreLocation Cert:\CurrentUser\My `
   -NotAfter (Get-Date).AddYears(10) `
-  -TextExtension @('2.5.29.19={text}critical:true')
+  -TextExtension @('2.5.29.19={critical}{text}ca=1&pathlength=1')
 
 $leaf = New-SelfSignedCertificate `
   -Type CodeSigningCert `
