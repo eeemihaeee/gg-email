@@ -64,8 +64,13 @@ jobs:
     runs-on: windows-latest
     timeout-minutes: 30
     env:
-      CSC_LINK: ${{ secrets.CSC_LINK }}
-      CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+      AZURE_PUBLISHER_NAME: ${{ secrets.AZURE_PUBLISHER_NAME }}
+      AZURE_ENDPOINT: ${{ secrets.AZURE_ENDPOINT }}
+      AZURE_SIGNING_ACCOUNT: ${{ secrets.AZURE_SIGNING_ACCOUNT }}
+      AZURE_CERT_PROFILE: ${{ secrets.AZURE_CERT_PROFILE }}
 
     steps:
       - uses: actions/checkout@v4
@@ -103,14 +108,34 @@ jobs:
       - name: Build application
         run: npm run build
 
+      # Конфиг Azure Trusted Signing генерируется из секретов, чтобы не
+      # хранить имена аккаунтов в репозитории и не ломать сборку без ключей.
+      - name: Prepare Azure Trusted Signing config
+        if: env.AZURE_CLIENT_ID != ''
+        shell: pwsh
+        run: |
+          @"
+          extends: ./electron-builder.yml
+          win:
+            azureSignOptions:
+              publisherName: "$env:AZURE_PUBLISHER_NAME"
+              endpoint: "$env:AZURE_ENDPOINT"
+              codeSigningAccountName: "$env:AZURE_SIGNING_ACCOUNT"
+              certificateProfileName: "$env:AZURE_CERT_PROFILE"
+          "@ | Set-Content electron-builder.azure.yml -Encoding utf8
+          Get-Content electron-builder.azure.yml
+
       - name: Build and publish installer
         if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
+        shell: pwsh
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npx electron-builder --win nsis --x64 --publish always
+        run: |
+          $config = if ($env:AZURE_CLIENT_ID) { 'electron-builder.azure.yml' } else { 'electron-builder.yml' }
+          npx electron-builder --config $config --win nsis --x64 --publish always
 
       - name: Verify code signature
-        if: env.CSC_LINK != ''
+        if: env.AZURE_CLIENT_ID != ''
         shell: pwsh
         run: |
           $file = Get-ChildItem release -Filter 'GG-Email-Setup-*.exe' | Select-Object -First 1

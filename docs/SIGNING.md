@@ -4,7 +4,47 @@
 Пока сертификаты не заданы, CI собирает **неподписанные** артефакты:
 Windows показывает SmartScreen, macOS — «приложение повреждено».
 
-## Windows
+## Azure Trusted Signing (выбранный вариант)
+
+CI уже умеет подписывать через Azure: если задан секрет `AZURE_CLIENT_ID`,
+workflow генерирует `electron-builder.azure.yml` и собирает с ним; если нет —
+собирает неподписанный артефакт.
+
+### Что создать в Azure
+
+1. Подписка Azure → зарегистрировать resource provider `Microsoft.CodeSigning`.
+2. Создать **Trusted Signing account** (регион, например East US).
+3. Пройти **Identity validation** (Organization) — юридическое название компании.
+   Это же название попадёт в сертификат и в `publisherName`.
+4. Создать **Certificate profile** типа *Public Trust* в этом аккаунте.
+5. App registration (Entra ID) → client secret.
+6. Назначить приложению роль **Trusted Signing Certificate Profile Signer**
+   на Trusted Signing account.
+
+### Секреты GitHub Actions
+
+| Secret | Пример / значение |
+| --- | --- |
+| `AZURE_TENANT_ID` | tenant GUID |
+| `AZURE_CLIENT_ID` | client ID приложения |
+| `AZURE_CLIENT_SECRET` | client secret |
+| `AZURE_PUBLISHER_NAME` | юридическое название из identity validation |
+| `AZURE_ENDPOINT` | `https://eus.codesigning.azure.net/` |
+| `AZURE_SIGNING_ACCOUNT` | имя Trusted Signing account |
+| `AZURE_CERT_PROFILE` | имя certificate profile |
+
+После добавления секретов: тег `v0.4.1` → CI подпишет установщик, выполнит
+`Get-AuthenticodeSignature` и опубликует релиз с `SHA256SUMS.txt`.
+SmartScreen для Trusted Signing доверяет сразу, как для EV.
+
+### Ограничения
+
+- Нужна подписка Azure и пройденная identity validation (может занять дни).
+- `publisherName` должен **точно** совпадать с названием в сертификате.
+- Для подписи используется облачный ключ, токен не нужен.
+
+## Windows (альтернатива: OV/EV PFX)
+
 
 ### Что нужно
 
