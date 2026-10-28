@@ -62,7 +62,7 @@ validation — из РФ это сейчас недоступно. Рабочи�
 Program — Windows покажет «Неизвестный издатель», даже если подпись валидна.
 Для внешней раздачи нужен сертификат CA из списка Microsoft.
 
-## Azure Trusted Signing (выбранный вариант)
+## Azure Trusted Signing (справочно, в РФ недоступно)
 
 CI уже умеет подписывать через Azure: если задан секрет `AZURE_CLIENT_ID`,
 workflow генерирует `electron-builder.azure.yml` и собирает с ним; если нет —
