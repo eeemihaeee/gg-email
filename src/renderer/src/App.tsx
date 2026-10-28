@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { useStore } from './store'
 import TitleBar from './components/TitleBar'
 import Sidebar from './components/Sidebar'
@@ -117,9 +118,9 @@ export default function App(): React.JSX.Element {
         <Reader />
       </div>
       <StatusBar />
-      {view === 'setup' && <SetupWizard />}
-      {view === 'settings' && <SettingsPanel />}
-      {compose && <Composer />}
+      {view === 'setup' && createPortal(<SetupWizard />, document.body)}
+      {view === 'settings' && createPortal(<SettingsPanel />, document.body)}
+      {compose && createPortal(<Composer />, document.body)}
       <Toasts />
       {!ready && (
         <div className="boot-splash">

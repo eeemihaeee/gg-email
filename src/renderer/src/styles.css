@@ -1967,3 +1967,34 @@ kbd {
 .sidebar:hover .sidebar-scroll::-webkit-scrollbar-thumb {
   background: var(--border);
 }
+
+
+/* Кнопка закрытия настроек должна быть видна в обеих темах. */
+.settings-head .icon-btn {
+  color: var(--text);
+  background: var(--bg-elev2);
+  border: 1px solid var(--border-soft);
+}
+
+.settings-head .icon-btn:hover {
+  background: var(--bg-hover);
+}
+
+/* Тонкие скроллбары во всех панелях, чтобы не было серых полос. */
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 4px;
+}
+
+*:hover::-webkit-scrollbar-thumb {
+  background: var(--border);
+}

@@ -6,6 +6,11 @@ import { createLogger } from './logger'
 
 const log = createLogger('updater')
 
+/** electron-updater для стабильного канала ищет latest.yml, а не stable.yml. */
+function toFeedChannel(channel: string): string {
+  return channel === 'stable' ? 'latest' : channel
+}
+
 const GITHUB_OWNER = 'eeemihaeee'
 const GITHUB_REPO = 'gg-email'
 
@@ -50,7 +55,7 @@ export class UpdateService {
     autoUpdater.autoDownload = true
     autoUpdater.autoInstallOnAppQuit = mode === 'auto'
     autoUpdater.allowPrerelease = policyValue<string>(this.policy, 'updateChannel', 'stable') !== 'stable'
-    autoUpdater.channel = policyValue<string>(this.policy, 'updateChannel', 'stable')
+    autoUpdater.channel = toFeedChannel(policyValue<string>(this.policy, 'updateChannel', 'stable'))
     autoUpdater.disableWebInstaller = true
 
     const baseUrl = policyValue<string>(this.policy, 'updateBaseUrl', '')
@@ -168,7 +173,7 @@ export class UpdateService {
       return
     }
     autoUpdater.allowPrerelease = policyValue<string>(policy, 'updateChannel', 'stable') !== 'stable'
-    autoUpdater.channel = policyValue<string>(policy, 'updateChannel', 'stable')
+    autoUpdater.channel = toFeedChannel(policyValue<string>(policy, 'updateChannel', 'stable'))
     this.scheduleNextCheck()
   }
 

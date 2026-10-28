@@ -42,19 +42,15 @@ export class AppContext {
     this.messages = new MessagesRepo(this.db, this.db.fts5)
     this.outbox = new OutboxRepo(this.db)
     this.settings = new SettingsRepo(this.db)
-    // Фирменные цвета для известных провайдеров (точка у ящика).
-    for (const account of this.accounts.list()) {
-      const domain = account.email.split('@')[1]?.toLowerCase() ?? ''
-      const brand =
-        domain === 'gmail.com' || domain === 'googlemail.com'
-          ? '#ea4335'
-          : domain.startsWith('yandex.') || domain === 'ya.ru'
-            ? '#fc3f1d'
-            : ['mail.ru', 'inbox.ru', 'bk.ru', 'list.ru', 'internet.ru'].includes(domain)
-              ? '#005ff9'
-              : undefined
-      if (brand && account.color !== brand) this.accounts.update(account.id, { color: brand })
-    }
+    // Разные цвета точек у ящиков: если ранее были проставлены фирменные
+    // цвета (все красные), возвращаем палитру по порядку.
+    const palette = ['#f23c30', '#f2994a', '#27ae60', '#2d9cdb', '#9b51e0', '#eb5757']
+    const branded = new Set(['#ea4335', '#fc3f1d', '#005ff9'])
+    this.accounts.list().forEach((account, index) => {
+      if (branded.has(account.color.toLowerCase())) {
+        this.accounts.update(account.id, { color: palette[index % palette.length]! })
+      }
+    })
 
     this.updater = new UpdateService(
       policy,

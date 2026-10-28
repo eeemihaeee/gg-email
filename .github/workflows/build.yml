@@ -161,6 +161,11 @@ jobs:
             --jq ".[] | select(.tag_name==\"$TAG\") | .id" |
             while read -r id; do gh api -X DELETE "repos/${GITHUB_REPOSITORY}/releases/$id"; done || true
 
+      - name: Add stable channel aliases
+        run: |
+          cp dist/latest.yml dist/stable.yml
+          cp dist/latest-mac.yml dist/stable-mac.yml
+
       - name: Publish release
         uses: softprops/action-gh-release@v2
         with:
@@ -178,4 +183,6 @@ jobs:
             dist/*.zip.blockmap
             dist/latest.yml
             dist/latest-mac.yml
+            dist/stable.yml
+            dist/stable-mac.yml
             dist/SHA256SUMS.txt
