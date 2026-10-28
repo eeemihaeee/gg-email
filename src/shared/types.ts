@@ -231,6 +231,8 @@ export interface BootstrapState {
   policy: PolicyState
   app: AppInfo
   updater: UpdaterState
+  /** Настроен ли OAuth-клиент (политика или oauth.json). */
+  oauth: { google: boolean; yandex: boolean }
   /** Текущее состояние синхронизации по аккаунтам (чтобы после перезагрузки страницы
    * пользователь сразу видел ошибку подключения, а не пустой список). */
   sync: SyncStatus[]

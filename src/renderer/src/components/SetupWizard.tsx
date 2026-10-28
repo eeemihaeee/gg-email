@@ -53,11 +53,12 @@ export default function SetupWizard(): React.JSX.Element {
 
   const patch = (values: Partial<FormState>): void => setForm((current) => ({ ...current, ...values }))
 
+  const oauthProviders = useStore((state) => state.oauthProviders)
   const oauthReady = (provider?: 'google' | 'yandex'): boolean => {
     if (!provider) return false
     return provider === 'google'
-      ? Boolean(policy.values.googleClientId)
-      : Boolean(policy.values.yandexClientId)
+      ? Boolean(policy.values.googleClientId) || oauthProviders.google
+      : Boolean(policy.values.yandexClientId) || oauthProviders.yandex
   }
 
   const applyAutoconfig = (result: AutoconfigResult): void => {
@@ -180,9 +181,7 @@ export default function SetupWizard(): React.JSX.Element {
     }
   }
 
-  const oauthConfigured =
-    (form.oauthProvider === 'google' && Boolean(policy.values.googleClientId)) ||
-    (form.oauthProvider === 'yandex' && Boolean(policy.values.yandexClientId))
+  const oauthConfigured = oauthReady(form.oauthProvider)
 
   return (
     <div className="modal-backdrop">
@@ -265,7 +264,7 @@ export default function SetupWizard(): React.JSX.Element {
               </span>
             </div>
 
-            {form.authKind === 'oauth2' && oauthConfigured && (
+            {oauthConfigured && (
               <div className="oauth-box">
                 <div>
                   <strong>Вход через OAuth2</strong>

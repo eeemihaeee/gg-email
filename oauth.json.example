@@ -1,0 +1,10 @@
+{
+  "google": {
+    "clientId": "1234567890-abcdefghijklmnopqrstuvwxyz.apps.googleusercontent.com",
+    "clientSecret": "GOCSPX-xxxxxxxxxxxxxxxxxxxxxxxx"
+  },
+  "yandex": {
+    "clientId": "0123456789abcdef0123456789abcdef",
+    "clientSecret": "fedcba9876543210fedcba9876543210"
+  }
+}

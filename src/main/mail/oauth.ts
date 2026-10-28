@@ -1,5 +1,7 @@
 import { createHash, randomBytes } from 'node:crypto'
+import { readFileSync } from 'node:fs'
 import { createServer, type Server } from 'node:http'
+import { dirname, join } from 'node:path'
 import { shell } from 'electron'
 import type { OAuthProvider } from '@shared/types'
 import type { PolicyState } from '@shared/types'
@@ -43,16 +45,64 @@ function base64url(buffer: Buffer): string {
   return buffer.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
 }
 
+interface FileClient {
+  clientId?: string
+  clientSecret?: string
+}
+
+type FileClients = Partial<Record<OAuthProvider, FileClient>>
+
+let fileClients: FileClients | null = null
+
+/**
+ * OAuth-клиент можно задать не только политикой, но и файлом oauth.json
+ * рядом с приложением (или по пути из GGEMAIL_OAUTH_CONFIG). Это позволяет
+ * раздать настройку вместе с папкой GG-Email-Web без прав администратора.
+ */
+function loadFileClients(): FileClients {
+  if (fileClients) return fileClients
+  const candidates = [
+    process.env.GGEMAIL_OAUTH_CONFIG ?? '',
+    join(process.cwd(), 'oauth.json'),
+    join(dirname(process.execPath), 'oauth.json')
+  ].filter((value) => value.length > 0)
+
+  for (const path of candidates) {
+    try {
+      const raw = readFileSync(path, 'utf8')
+      const parsed = JSON.parse(raw) as FileClients
+      if (parsed && typeof parsed === 'object') {
+        fileClients = parsed
+        log.info(`OAuth-конфигурация загружена: ${path}`)
+        return fileClients
+      }
+    } catch {
+      // файла нет или он некорректный — пробуем следующий путь
+    }
+  }
+  fileClients = {}
+  return fileClients
+}
+
 function clientIdFor(provider: OAuthProvider, policy: PolicyState): string | undefined {
   const key = provider === 'google' ? 'googleClientId' : 'yandexClientId'
   const value = policyValue(policy, key, '')
-  return typeof value === 'string' && value.trim() ? value.trim() : undefined
+  if (typeof value === 'string' && value.trim()) return value.trim()
+  const fileValue = loadFileClients()[provider]?.clientId
+  return typeof fileValue === 'string' && fileValue.trim() ? fileValue.trim() : undefined
+}
+
+/** Настроен ли OAuth-клиент для провайдера (политика или oauth.json). */
+export function oauthConfigured(provider: OAuthProvider, policy: PolicyState): boolean {
+  return Boolean(clientIdFor(provider, policy))
 }
 
 function clientSecretFor(provider: OAuthProvider, policy: PolicyState): string | undefined {
   const key = provider === 'google' ? 'googleClientSecret' : 'yandexClientSecret'
   const value = policyValue(policy, key, '')
-  return typeof value === 'string' && value.trim() ? value.trim() : undefined
+  if (typeof value === 'string' && value.trim()) return value.trim()
+  const fileValue = loadFileClients()[provider]?.clientSecret
+  return typeof fileValue === 'string' && fileValue.trim() ? fileValue.trim() : undefined
 }
 
 async function exchangeToken(
@@ -108,7 +158,7 @@ export async function authorize(
   const clientId = clientIdFor(provider, policy)
   if (!clientId) {
     throw new Error(
-      'OAuth не настроен: администратор должен задать Client ID в групповой политике'
+      'OAuth не настроен: задайте Client ID в политике или в файле oauth.json рядом с приложением'
     )
   }
 

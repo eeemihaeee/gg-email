@@ -28,7 +28,7 @@ import { createLogger } from './logger'
 import { testImapConnection } from './mail/imap'
 import { testSmtpConnection } from './mail/smtp'
 import { autoconfigure } from './mail/autoconfig'
-import { authorize } from './mail/oauth'
+import { authorize, oauthConfigured } from './mail/oauth'
 
 const log = createLogger('ipc')
 
@@ -91,6 +91,10 @@ export function createApiHandlers(
     policy: ctx.policy,
     app: appInfo(),
     updater: ctx.updater.snapshot(),
+    oauth: {
+      google: oauthConfigured('google', ctx.policy),
+      yandex: oauthConfigured('yandex', ctx.policy)
+    },
     sync: Array.from(ctx.syncers.values()).map((syncer) => syncer.getStatus())
   }))
 

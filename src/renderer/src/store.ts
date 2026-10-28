@@ -58,6 +58,7 @@ interface Store {
   folders: Folder[]
   policy: PolicyState
   appInfo: AppInfo | null
+  oauthProviders: { google: boolean; yandex: boolean }
   updater: UpdaterState
   settings: UserSettings | null
   sync: Record<string, SyncStatus>
@@ -147,6 +148,7 @@ export const useStore = create<Store>()((set, get) => ({
   accounts: [],
   folders: [],
   policy: EMPTY_POLICY,
+  oauthProviders: { google: false, yandex: false },
   appInfo: null,
   updater: { status: 'idle' },
   settings: null,
@@ -180,6 +182,7 @@ export const useStore = create<Store>()((set, get) => ({
         ready: true,
         accounts: state.accounts,
         folders: state.folders,
+        oauthProviders: state.oauth ?? { google: false, yandex: false },
         policy: state.policy,
         appInfo: state.app,
         updater: state.updater,

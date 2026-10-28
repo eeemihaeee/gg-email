@@ -384,6 +384,7 @@ export function installDemoApi(): void {
 
   const api: KurierApi = {
     bootstrap: async () => ({
+      oauth: { google: false, yandex: false },
       accounts,
       folders,
       policy,
