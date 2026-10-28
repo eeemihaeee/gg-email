@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
@@ -226,8 +227,29 @@ static class Program
 
 internal sealed class MainForm : Form
 {
+    [DllImport("dwmapi.dll")]
+    private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attribute, ref int value, int size);
+
     private readonly string _profile;
     private readonly WebView2 _view;
+
+    protected override void OnHandleCreated(EventArgs e)
+    {
+        base.OnHandleCreated(e);
+        // Светлый заголовок окна независимо от тёмной темы Windows.
+        try
+        {
+            int light = 0;
+            if (DwmSetWindowAttribute(Handle, 20, ref light, sizeof(int)) != 0)
+            {
+                DwmSetWindowAttribute(Handle, 19, ref light, sizeof(int));
+            }
+        }
+        catch
+        {
+            // на старых сборках Windows атрибут может отсутствовать
+        }
+    }
 
     public MainForm(string profile)
     {
