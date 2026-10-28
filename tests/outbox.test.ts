@@ -6,7 +6,7 @@ import type { PolicyState } from '@shared/types'
  * Офлайн-очередь отправки: письмо ставится в очередь, помечается ошибкой,
  * повторяется и в итоге помечается отправленным. Без сети и Java.
  */
-const policy: PolicyState = { managed: false, source: 'none', values: {}, locked: [] }
+const policy: PolicyState = { managed: false, source: 'none', values: {}, locked: [], errors: [] }
 
 describe('очередь исходящих писем', () => {
   let ctx: AppContext

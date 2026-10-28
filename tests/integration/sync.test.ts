@@ -22,7 +22,8 @@ const policy: PolicyState = {
   managed: false,
   source: 'none',
   values: {},
-  locked: []
+  locked: [],
+  errors: []
 }
 
 const SUBJECT = `GreenMail sync ${Date.now()}`

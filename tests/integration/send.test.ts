@@ -18,7 +18,7 @@ import {
  */
 const enabled = process.env.GGEMAIL_IT === '1'
 
-const policy: PolicyState = { managed: false, source: 'none', values: {}, locked: [] }
+const policy: PolicyState = { managed: false, source: 'none', values: {}, locked: [], errors: [] }
 const SUBJECT = `GG Email send ${Date.now()}`
 
 describe.skipIf(!enabled)('отправка письма через GreenMail', () => {
@@ -50,6 +50,7 @@ describe.skipIf(!enabled)('отправка письма через GreenMail', 
     expect(account).toBeTruthy()
 
     const draft: DraftPayload = {
+      accountId,
       to: [{ name: 'Test', email: 'test@localhost' }],
       cc: [],
       bcc: [],
@@ -72,6 +73,7 @@ describe.skipIf(!enabled)('отправка письма через GreenMail', 
   it('письмо с вложением собирается и отправляется', async () => {
     const account = ctx.accounts.get(accountId)
     const draft: DraftPayload = {
+      accountId,
       to: [{ name: 'Test', email: 'test@localhost' }],
       cc: [],
       bcc: [],
@@ -81,7 +83,6 @@ describe.skipIf(!enabled)('отправка письма через GreenMail', 
         {
           filename: 'note.txt',
           contentType: 'text/plain',
-          size: 6,
           contentBase64: Buffer.from('hello\n', 'utf8').toString('base64')
         }
       ],
