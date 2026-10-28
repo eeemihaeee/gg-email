@@ -25,10 +25,12 @@ const policy: PolicyState = {
   locked: []
 }
 
+const SUBJECT = `GreenMail sync ${Date.now()}`
+
 const RAW_MESSAGE = [
   'From: GreenMail <green@example.com>',
   'To: Test <test@example.com>',
-  'Subject: GreenMail sync test',
+  `Subject: ${SUBJECT}`,
   'Date: Tue, 28 Oct 2026 10:00:00 +0000',
   'Message-ID: <sync-test-1@example.com>',
   'MIME-Version: 1.0',
@@ -73,7 +75,7 @@ describe.skipIf(!enabled)('синхронизация с GreenMail', () => {
   afterAll(async () => {
     await ctx?.stopAll()
     ctx?.close()
-    stopGreenMail()
+    await stopGreenMail()
   })
 
   it('забирает письмо из INBOX в локальную базу', async () => {
@@ -84,7 +86,7 @@ describe.skipIf(!enabled)('синхронизация с GreenMail', () => {
       page = ctx.messages.list({ accountId, limit: 10 })
     }
     expect(page.total).toBeGreaterThan(0)
-    expect(page.items[0]?.subject).toBe('GreenMail sync test')
+    expect(page.items[0]?.subject).toBe(SUBJECT)
     expect(page.items[0]?.from[0]?.email).toBe('green@example.com')
   })
 

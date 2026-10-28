@@ -126,8 +126,9 @@ npm run test:integration # IMAP/SMTP + синхронизация на GreenMail
 ```
 
 Интеграционные тесты скачивают `greenmail-standalone` в `.cache/` и поднимают
-локальный сервер на портах 3143 (IMAP) и 3025 (SMTP). Без `GGEMAIL_IT=1` они
-пропускаются. В CI шаг выполняется в Windows-job с Java 17.
+локальный сервер на портах 3143 (IMAP) и 3025 (SMTP): проверяются вход IMAP/SMTP,
+сквозная синхронизация письма в SQLite и отправка через `buildRawMessage`/`sendPrepared`.
+Без `GGEMAIL_IT=1` они пропускаются. В CI шаг выполняется в Windows-job с Java 17.
 
 
 ```powershell

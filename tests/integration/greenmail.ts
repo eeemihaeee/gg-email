@@ -33,7 +33,25 @@ function waitPort(port: number, timeout = 30_000): Promise<void> {
   })
 }
 
+function portBusy(port: number): Promise<boolean> {
+  return new Promise((resolve) => {
+    const socket = connect({ host: '127.0.0.1', port })
+    socket.once('connect', () => {
+      socket.destroy()
+      resolve(true)
+    })
+    socket.once('error', () => {
+      socket.destroy()
+      resolve(false)
+    })
+  })
+}
+
 export async function startGreenMail(): Promise<void> {
+  const busy = await Promise.all([portBusy(GREENMAIL_IMAP_PORT), portBusy(GREENMAIL_SMTP_PORT)])
+  if (busy[0] || busy[1]) {
+    throw new Error('порты 3143/3025 заняты: остался старый процесс GreenMail — завершите java.exe')
+  }
   const download = spawnSync(process.execPath, ['tools/fetch-greenmail.mjs'], {
     stdio: 'inherit'
   })
@@ -55,7 +73,16 @@ export async function startGreenMail(): Promise<void> {
   await new Promise((resolve) => setTimeout(resolve, 800))
 }
 
-export function stopGreenMail(): void {
-  server?.kill()
+export async function stopGreenMail(): Promise<void> {
+  const current = server
   server = null
+  if (!current?.pid) return
+  if (process.platform === 'win32') {
+    spawnSync('taskkill', ['/PID', String(current.pid), '/T', '/F'])
+  } else {
+    current.kill('SIGTERM')
+  }
+  // Даём ОС освободить порты, но не блокируем тестовый хук надолго.
+  await new Promise((resolve) => setTimeout(resolve, 800))
 }
+

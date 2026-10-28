@@ -22,8 +22,8 @@ describe.skipIf(!enabled)('IMAP/SMTP против GreenMail', () => {
     await startGreenMail()
   }, 90_000)
 
-  afterAll(() => {
-    stopGreenMail()
+  afterAll(async () => {
+    await stopGreenMail()
   })
 
   it('IMAP: верный пароль принимается, видны папки', async () => {
