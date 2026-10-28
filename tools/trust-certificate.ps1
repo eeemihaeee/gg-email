@@ -1,4 +1,4 @@
-param(
+﻿param(
   [Parameter(Mandatory = $true)][string]$RootCertificate,
   [Parameter(Mandatory = $true)][string]$PublisherCertificate,
   [switch]$Machine

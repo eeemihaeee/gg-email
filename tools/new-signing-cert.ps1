@@ -1,4 +1,4 @@
-param(
+﻿param(
   [string]$Organization = 'GG Email',
   [string]$CommonName = 'GG Email',
   [string]$OutDir = 'build\\certs',
