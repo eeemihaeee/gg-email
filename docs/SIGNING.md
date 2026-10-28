@@ -16,6 +16,41 @@ Windows показывает SmartScreen, macOS — «приложение по�
    account, certificate profile, service principal с ролью «Trusted Signing
    Certificate Profile Signer».
 
+### Важно про EV и CI
+
+EV-сертификат обычно лежит на USB-токене или в HSM — GitHub Actions такой
+токен использовать не может. Для CI нужен один из вариантов:
+
+- **OV-сертификат в экспортируемом `.pfx`** — самый простой путь;
+- **EV/OV в облачном HSM** (Azure Trusted Signing, DigiCert KeyLocker,
+  GlobalSign Atlas) — тогда в CI настраивается доступ к облачному ключу.
+
+Если сертификат уже установлен на этой машине, экспорт в PFX:
+
+```powershell
+# отпечаток сертификата
+Get-ChildItem Cert:\CurrentUser\My -CodeSigningCert | Format-List Subject, Thumbprint
+
+# экспорт (пароль задаёте сами)
+certutil -p "ПарольPFX" -exportPFX My <Thumbprint> gg-email-codesign.pfx
+
+# base64 для секрета CSC_LINK
+[Convert]::ToBase64String([IO.File]::ReadAllBytes("gg-email-codesign.pfx")) | Set-Clipboard
+```
+
+Дальше: GitHub → Settings → Secrets → Actions:
+
+- `CSC_LINK` — вставленный base64 (одной строкой);
+- `CSC_KEY_PASSWORD` — пароль PFX.
+
+После этого CI подпишет установщик, `GG Email.exe` и uninstaller, поставит
+метку времени DigiCert (подпись останется действительной после истечения
+сертификата) и выполнит `Get-AuthenticodeSignature` — при невалидной подписи
+сборка упадёт. В релиз также кладётся `SHA256SUMS.txt`.
+
+Для OV SmartScreen начинает доверять не сразу: репутация набирается по мере
+загрузок. EV даёт доверие сразу, но требует токен/HSM.
+
 ### Как передать в electron-builder
 
 В GitHub → Settings → Secrets and variables → Actions добавить:
