@@ -84,6 +84,17 @@ jobs:
       - name: Unit tests
         run: npm test
 
+      - name: Setup Java for GreenMail
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Integration tests (IMAP/SMTP, GreenMail)
+        env:
+          GGEMAIL_IT: '1'
+        run: npm run test:integration
+
       - name: Check ADMX is up to date
         run: |
           npm run admx

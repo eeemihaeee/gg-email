@@ -22,6 +22,7 @@
     "start": "electron-vite preview",
     "typecheck": "tsc -p tsconfig.node.json --noEmit && tsc -p tsconfig.web.json --noEmit",
     "test": "vitest run",
+    "test:integration": "vitest run tests/integration",
     "test:watch": "vitest",
     "admx": "node tools/gen-admx.mjs",
     "dist": "npm run build && electron-builder --win nsis --x64",
