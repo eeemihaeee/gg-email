@@ -35,17 +35,11 @@ jobs:
       - name: Build application
         run: npm run build
 
-      # Оба архитектуры собираются в одном job, чтобы публикация ассетов
-      # в GitHub Release не конфликтовала между параллельными задачами.
+      # macOS пока без сертификата: identity: null в electron-builder.yml.
       - name: Build and publish macOS (x64 + arm64)
         if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CSC_LINK: ${{ secrets.CSC_LINK }}
-          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
         run: npx electron-builder --mac dmg zip --x64 --arm64 --publish always
 
@@ -69,6 +63,9 @@ jobs:
     needs: macos
     runs-on: windows-latest
     timeout-minutes: 30
+    env:
+      CSC_LINK: ${{ secrets.CSC_LINK }}
+      CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
 
     steps:
       - uses: actions/checkout@v4
@@ -99,9 +96,27 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CSC_LINK: ${{ secrets.CSC_LINK }}
-          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
         run: npx electron-builder --win nsis --x64 --publish always
+
+      - name: Verify code signature
+        if: env.CSC_LINK != ''
+        shell: pwsh
+        run: |
+          $file = Get-ChildItem release -Filter 'GG-Email-Setup-*.exe' | Select-Object -First 1
+          $sig = Get-AuthenticodeSignature $file.FullName
+          $sig | Format-List Status, StatusMessage, SignerCertificate
+          if ($sig.Status -ne 'Valid') { throw "Подпись недействительна: $($sig.StatusMessage)" }
+
+      - name: Generate SHA-256 checksums
+        if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
+        shell: pwsh
+        run: |
+          $lines = Get-ChildItem release -Include '*.exe' -File | ForEach-Object {
+            $hash = (Get-FileHash $_.FullName -Algorithm SHA256).Hash
+            "$hash  $($_.Name)"
+          }
+          $lines | Set-Content release/SHA256SUMS.txt
+          Get-Content release/SHA256SUMS.txt
 
       - name: Upload installer artifact
         if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
@@ -112,3 +127,4 @@ jobs:
             release/*.exe
             release/*.blockmap
             release/latest.yml
+            release/SHA256SUMS.txt
