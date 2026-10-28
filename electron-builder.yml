@@ -38,6 +38,8 @@ nsis:
   include: build/installer.nsh
 
 mac:
+  # Подпись включается установкой сертификата; без него собираем unsigned.
+  identity: null
   target:
     - target: dmg
       arch:
