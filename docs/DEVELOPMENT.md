@@ -121,6 +121,16 @@ tests/               vitest
 ## Тесты
 
 ```powershell
+npm test                 # модульные тесты
+npm run test:integration # IMAP/SMTP + синхронизация на GreenMail (нужна Java 17+)
+```
+
+Интеграционные тесты скачивают `greenmail-standalone` в `.cache/` и поднимают
+локальный сервер на портах 3143 (IMAP) и 3025 (SMTP). Без `GGEMAIL_IT=1` они
+пропускаются. В CI шаг выполняется в Windows-job с Java 17.
+
+
+```powershell
 npm test
 ```
 
