@@ -74,6 +74,7 @@ jobs:
       # Запасной вариант: OV-сертификат в PFX (base64), если Azure недоступен.
       CSC_LINK: ${{ secrets.CSC_LINK }}
       CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+      ROOT_CERT_BASE64: ${{ secrets.ROOT_CERT_BASE64 }}
 
     steps:
       - uses: actions/checkout@v4
@@ -110,6 +111,15 @@ jobs:
 
       - name: Build application
         run: npm run build
+
+      - name: Trust internal code-signing root (CI)
+        if: env.ROOT_CERT_BASE64 != ''
+        shell: pwsh
+        run: |
+          $path = Join-Path $env:RUNNER_TEMP 'gg-email-root.cer'
+          [IO.File]::WriteAllBytes($path, [Convert]::FromBase64String($env:ROOT_CERT_BASE64))
+          Import-Certificate -FilePath $path -CertStoreLocation Cert:\LocalMachine\Root | Out-Null
+          Write-Host 'Внутренний корневой сертификат установлен на раннере'
 
       # Конфиг Azure Trusted Signing генерируется из секретов, чтобы не
       # хранить имена аккаунтов в репозитории и не ломать сборку без ключей.
