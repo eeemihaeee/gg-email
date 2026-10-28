@@ -29,6 +29,7 @@ import { testImapConnection } from './mail/imap'
 import { testSmtpConnection } from './mail/smtp'
 import { autoconfigure } from './mail/autoconfig'
 import { authorize, oauthConfigured } from './mail/oauth'
+import { exportDiagnostics } from './diagnostics'
 
 const log = createLogger('ipc')
 
@@ -353,6 +354,16 @@ export function createApiHandlers(
 
   handle<void>(CHANNELS.appClearBodies, () => {
     ctx.clearBodies()
+  })
+
+  handle<string>(CHANNELS.appDiagnostics, () => {
+    const file = exportDiagnostics(ctx, appInfo())
+    try {
+      shell.showItemInFolder(file)
+    } catch {
+      // в веб-режиме проводник может быть недоступен
+    }
+    return file
   })
 
   handle(CHANNELS.oauthStart, async (_event, provider: 'google' | 'yandex', email?: string) => {

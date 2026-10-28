@@ -102,7 +102,8 @@ const api: KurierApi = {
       ipcRenderer.invoke(CHANNELS.appOpenExternal, url) as Promise<void>,
     clearCache: () => ipcRenderer.invoke(CHANNELS.appClearCache) as Promise<void>,
     clearBodies: () => ipcRenderer.invoke(CHANNELS.appClearBodies) as Promise<void>,
-    cacheStats: () => ipcRenderer.invoke(CHANNELS.appCacheStats) as Promise<CacheStats>
+    cacheStats: () => ipcRenderer.invoke(CHANNELS.appCacheStats) as Promise<CacheStats>,
+    exportDiagnostics: () => ipcRenderer.invoke(CHANNELS.appDiagnostics) as Promise<string>
   },
   oauth: {
     start: (provider: 'google' | 'yandex', email?: string) =>

@@ -152,7 +152,8 @@ export function installWebApi(boot: WebBoot): void {
       },
       clearCache: () => call<void>(CHANNELS.appClearCache),
       clearBodies: () => call<void>(CHANNELS.appClearBodies),
-      cacheStats: () => call<CacheStats>(CHANNELS.appCacheStats)
+      cacheStats: () => call<CacheStats>(CHANNELS.appCacheStats),
+    exportDiagnostics: () => call<string>(CHANNELS.appDiagnostics)
     },
     oauth: {
       start: (provider, email) =>

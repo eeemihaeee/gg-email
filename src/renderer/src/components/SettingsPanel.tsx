@@ -288,6 +288,19 @@ export default function SettingsPanel(): React.JSX.Element {
                     <Icon name="folder" size={15} /> Открыть папку данных
                   </button>
                   <button
+                    className="btn"
+                    onClick={async () => {
+                      try {
+                        const path = await window.kurier.app.exportDiagnostics()
+                        useStore.getState().pushToast('success', `Диагностика сохранена: ${path}`)
+                      } catch (error) {
+                        useStore.getState().pushToast('error', (error as Error).message)
+                      }
+                    }}
+                  >
+                    <Icon name="download" size={15} /> Экспорт диагностики
+                  </button>
+                  <button
                     className="btn danger"
                     onClick={() => {
                       if (window.confirm('Очистить локальный кеш писем? Данные на сервере не изменятся.')) {

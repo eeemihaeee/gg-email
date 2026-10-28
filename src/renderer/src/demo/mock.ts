@@ -554,7 +554,8 @@ export function installDemoApi(): void {
         messages: 207,
         accounts: 3,
         oldestBodyAt: Date.now() - 40 * 86_400_000
-      })
+      }),
+      exportDiagnostics: async () => 'demo/GG-Email-Diagnostics.zip'
     },
     oauth: {
       start: async () => ({ ok: false, error: 'демо-режим' })

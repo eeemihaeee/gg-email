@@ -54,6 +54,7 @@ export const CHANNELS = {
   appClearCache: 'app:clear-cache',
   appClearBodies: 'app:clear-bodies',
   appCacheStats: 'app:cache-stats',
+  appDiagnostics: 'app:diagnostics',
   oauthStart: 'oauth:start',
   windowMinimize: 'window:minimize',
   windowMaximize: 'window:maximize',
@@ -145,6 +146,7 @@ export interface KurierApi {
     clearCache(): Promise<void>
     clearBodies(): Promise<void>
     cacheStats(): Promise<CacheStats>
+    exportDiagnostics(): Promise<string>
   }
   oauth: {
     start(provider: 'google' | 'yandex', email?: string): Promise<{ ok: boolean; refreshToken?: string; error?: string }>
