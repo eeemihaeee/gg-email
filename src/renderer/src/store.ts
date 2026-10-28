@@ -55,6 +55,7 @@ interface Store {
   ready: boolean
   initError: string | null
   accounts: Account[]
+  editingAccount: Account | null
   folders: Folder[]
   policy: PolicyState
   appInfo: AppInfo | null
@@ -81,7 +82,8 @@ interface Store {
 
   init(): Promise<void>
   openSettings(): void
-  openSetup(): void
+  openSetup(account?: Account): void
+  updateAccount(id: string, patch: Partial<Account>, secret?: string): Promise<void>
   closeOverlay(): void
 
   selectUnified(accountId?: string): Promise<void>
@@ -146,6 +148,7 @@ export const useStore = create<Store>()((set, get) => ({
   ready: false,
   initError: null,
   accounts: [],
+  editingAccount: null,
   folders: [],
   policy: EMPTY_POLICY,
   oauthProviders: { google: false, yandex: false },
@@ -203,12 +206,12 @@ export const useStore = create<Store>()((set, get) => ({
     set({ view: 'settings' })
   },
 
-  openSetup() {
-    set({ view: 'setup' })
+  openSetup(account) {
+    set({ view: 'setup', editingAccount: account ?? null })
   },
 
   closeOverlay() {
-    set({ view: get().accounts.length > 0 ? 'mail' : 'setup' })
+    set({ view: get().accounts.length > 0 ? 'mail' : 'setup', editingAccount: null })
   },
 
   async selectUnified(accountId) {
@@ -519,6 +522,19 @@ export const useStore = create<Store>()((set, get) => ({
     })
     await get().loadMessages(true)
     return account
+  },
+
+  async updateAccount(id, patch, secret) {
+    if (secret !== undefined && secret.length > 0) {
+      await window.kurier.accounts.setSecret(id, secret)
+    }
+    await window.kurier.accounts.update(id, patch)
+    const [accounts, folders] = await Promise.all([
+      window.kurier.accounts.list(),
+      window.kurier.folders.list()
+    ])
+    set({ accounts, folders, view: 'mail', editingAccount: null })
+    await get().loadMessages(true)
   },
 
   async updateSettings(patch) {

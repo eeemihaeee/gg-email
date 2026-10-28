@@ -161,7 +161,7 @@ export default function Sidebar(): React.JSX.Element {
         )}
 
         {allowAdd && (
-          <button className="add-account" onClick={openSetup}>
+          <button className="add-account" onClick={() => openSetup()}>
             <Icon name="plus" size={16} />
             <span>Добавить учётную запись</span>
           </button>

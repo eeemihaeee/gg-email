@@ -1911,3 +1911,34 @@ kbd {
 .domain-chip.active .domain-mark {
   box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--chip-color) 35%, transparent);
 }
+
+.brand-svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+.brand-letter {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.domain-chip {
+  position: relative;
+  overflow: visible;
+}
+
+.domain-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  border: 2px solid var(--bg-elev);
+  box-sizing: content-box;
+  z-index: 2;
+}

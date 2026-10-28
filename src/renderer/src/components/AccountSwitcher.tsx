@@ -49,7 +49,7 @@ export default function AccountSwitcher(): React.JSX.Element | null {
         <button
           className="account-sphere add"
           title="Добавить почтовый ящик"
-          onClick={openSetup}
+          onClick={() => openSetup()}
         >
           +
         </button>

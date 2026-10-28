@@ -42,10 +42,30 @@ export default function SetupWizard(): React.JSX.Element {
   const policy = useStore((state) => state.policy)
   const closeOverlay = useStore((state) => state.closeOverlay)
   const addAccount = useStore((state) => state.addAccount)
+  const editingAccount = useStore((state) => state.editingAccount)
+  const updateAccount = useStore((state) => state.updateAccount)
   const pushToast = useStore((state) => state.pushToast)
 
-  const [step, setStep] = useState<Step>('email')
-  const [form, setForm] = useState<FormState>(EMPTY)
+  const [step, setStep] = useState<Step>(editingAccount ? 'server' : 'email')
+  const [form, setForm] = useState<FormState>(() =>
+    editingAccount
+      ? {
+          ...EMPTY,
+          email: editingAccount.email,
+          displayName: editingAccount.displayName,
+          username: editingAccount.username,
+          imapHost: editingAccount.imap.host,
+          imapPort: editingAccount.imap.port,
+          imapSecurity: editingAccount.imap.security,
+          smtpHost: editingAccount.smtp.host,
+          smtpPort: editingAccount.smtp.port,
+          smtpSecurity: editingAccount.smtp.security,
+          authKind: editingAccount.authKind,
+          oauthProvider: editingAccount.oauthProvider,
+          password: ''
+        }
+      : EMPTY
+  )
   const [advanced, setAdvanced] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -171,6 +191,20 @@ export default function SetupWizard(): React.JSX.Element {
     setBusy(true)
     setError(null)
     try {
+      if (editingAccount) {
+        const input = toInput()
+        await updateAccount(editingAccount.id, {
+          email: input.email,
+          displayName: input.displayName,
+          username: input.username,
+          imap: input.imap,
+          smtp: input.smtp,
+          authKind: input.authKind,
+          oauthProvider: input.oauthProvider
+        }, input.password)
+        pushToast('success', 'Учётная запись изменена')
+        return
+      }
       await addAccount(toInput())
       setStep('done')
       pushToast('success', 'Учётная запись добавлена, идёт синхронизация')

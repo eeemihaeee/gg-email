@@ -107,18 +107,26 @@ export default function SettingsPanel(): React.JSX.Element {
                         </span>
                       </div>
                       {allowManage && (
+                        <>
                         <button
                           className="btn ghost compact"
+                          onClick={() => openSetup(account)}
+                        >
+                          Изменить
+                        </button>
+                        <button
+                          className="link-btn"
                           onClick={() => void removeAccount(account.id, account.email)}
                         >
                           Удалить
                         </button>
+                        </>
                       )}
                     </div>
                   ))}
                 </div>
                 {allowManage ? (
-                  <button className="btn" onClick={openSetup}>
+                  <button className="btn" onClick={() => openSetup()}>
                     <Icon name="plus" size={16} /> Добавить ящик
                   </button>
                 ) : (
