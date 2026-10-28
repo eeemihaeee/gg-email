@@ -116,13 +116,19 @@ function AccountSection({ account }: { account: Account }): React.JSX.Element {
 }
 
 export default function Sidebar(): React.JSX.Element {
-  const accounts = useStore((state) => state.accounts)
+  const allAccounts = useStore((state) => state.accounts)
   const folders = useStore((state) => state.folders)
   const selection = useStore((state) => state.selection)
   const policy = useStore((state) => state.policy)
   const openSetup = useStore((state) => state.openSetup)
   const openSettings = useStore((state) => state.openSettings)
   const selectUnified = useStore((state) => state.selectUnified)
+
+  const accounts = selection.domain
+    ? allAccounts.filter((account) =>
+        account.email.toLowerCase().endsWith('@' + selection.domain!.toLowerCase())
+      )
+    : allAccounts
 
   const unifiedUnread = folders
     .filter((folder) => folder.role === 'inbox')

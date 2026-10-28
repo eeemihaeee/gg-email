@@ -144,7 +144,12 @@ export function installWebApi(boot: WebBoot): void {
     app: {
       info: () => call<AppInfo>(CHANNELS.appInfo),
       openDataFolder: () => call<void>(CHANNELS.appOpenData),
-      openExternal: (url: string) => call<void>(CHANNELS.appOpenExternal, url),
+      openExternal: async (url: string) => {
+        // В WebView2/браузере надёжнее открыть ссылку через window.open:
+        // WebView2 перехватывает её в NewWindowRequested и отдаёт системному браузеру.
+        const opened = window.open(url, '_blank', 'noopener')
+        if (!opened) await call<void>(CHANNELS.appOpenExternal, url)
+      },
       clearCache: () => call<void>(CHANNELS.appClearCache),
       clearBodies: () => call<void>(CHANNELS.appClearBodies),
       cacheStats: () => call<CacheStats>(CHANNELS.appCacheStats)

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useStore } from '../store'
 import { Icon } from './Icon'
-import AccountSwitcher from './AccountSwitcher'
+import DomainSwitcher from './DomainSwitcher'
 
 export default function TitleBar(): React.JSX.Element {
   const query = useStore((state) => state.query)
@@ -72,7 +72,7 @@ export default function TitleBar(): React.JSX.Element {
         )}
       </div>
 
-      <AccountSwitcher />
+      <DomainSwitcher />
 
       <div className="titlebar-actions">
         <button

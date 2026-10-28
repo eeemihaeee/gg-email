@@ -507,6 +507,10 @@ export class MessagesRepo {
       where.push('m.folder_id = ?')
       params.push(query.folderId)
     }
+    if (query.domain) {
+      where.push('lower(a.email) LIKE ?')
+      params.push(`%@${query.domain.toLowerCase()}`)
+    }
     if (query.role) {
       where.push('f.role = ?')
       params.push(query.role)
@@ -525,7 +529,7 @@ export class MessagesRepo {
     const offset = Math.max(query.offset ?? 0, 0)
 
     const totalRow = this.db.get<{ total: number }>(
-      `SELECT COUNT(*) AS total FROM messages m JOIN folders f ON f.id = m.folder_id ${whereSql}`,
+      `SELECT COUNT(*) AS total FROM messages m JOIN folders f ON f.id = m.folder_id JOIN accounts a ON a.id = m.account_id ${whereSql}`,
       ...params
     )
 

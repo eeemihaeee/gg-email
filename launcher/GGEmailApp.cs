@@ -2,7 +2,9 @@ using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Net;
 using System.Net.Sockets;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
 using Microsoft.Web.WebView2.Core;
@@ -15,6 +17,21 @@ static class Program
     public const int Port = 4173;
     public const string Token = "gg-email-local";
     public const string Url = "http://127.0.0.1:4173/?token=gg-email-local";
+    public const string Repo = "eeemihaeee/gg-email";
+    public static readonly string LocalVersion = ReadLocalVersion();
+
+    private static string ReadLocalVersion()
+    {
+        try
+        {
+            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "version.txt");
+            if (File.Exists(path)) return File.ReadAllText(path).Trim();
+        }
+        catch
+        {
+        }
+        return "0.3.0";
+    }
 
     private static string _logPath = Path.Combine(Path.GetTempPath(), "gg-email-app.log");
 
@@ -220,6 +237,13 @@ internal sealed class MainForm : Form
         Height = 900;
         MinimumSize = new Size(900, 600);
         StartPosition = FormStartPosition.CenterScreen;
+        try
+        {
+            Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
+        }
+        catch
+        {
+        }
         BackColor = Color.White;
         _view = new WebView2 { Dock = DockStyle.Fill };
         Controls.Add(_view);
@@ -251,6 +275,7 @@ internal sealed class MainForm : Form
             };
             _view.Source = new Uri(Program.Url);
             Program.Log("webview2 ready");
+            ThreadPool.QueueUserWorkItem(delegate { CheckUpdates(); });
         }
         catch (Exception error)
         {
@@ -268,5 +293,59 @@ internal sealed class MainForm : Form
             }
             Close();
         }
+    }
+
+    /// <summary>Проверяет последний релиз на GitHub и предлагает обновиться.</summary>
+    private void CheckUpdates()
+    {
+        try
+        {
+            using (var client = new WebClient())
+            {
+                client.Headers["User-Agent"] = "GG-Email";
+                string json = client.DownloadString(
+                    "https://api.github.com/repos/" + Program.Repo + "/releases/latest");
+                Match match = Regex.Match(json, "\"tag_name\"\\s*:\\s*\"v?([0-9.]+)\"");
+                if (!match.Success) return;
+                string latest = match.Groups[1].Value;
+                if (!IsNewer(latest, Program.LocalVersion)) return;
+                BeginInvoke(new Action(delegate
+                {
+                    DialogResult answer = MessageBox.Show(
+                        "Доступна новая версия " + latest + " (у вас " + Program.LocalVersion + ").\n" +
+                        "Открыть страницу загрузки?",
+                        "GG Email", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+                    if (answer != DialogResult.Yes) return;
+                    try
+                    {
+                        Process.Start("https://github.com/" + Program.Repo + "/releases/latest");
+                    }
+                    catch (Exception error)
+                    {
+                        Program.Log("open release failed: " + error.Message);
+                    }
+                }));
+            }
+        }
+        catch (Exception error)
+        {
+            Program.Log("update check failed: " + error.Message);
+        }
+    }
+
+    private static bool IsNewer(string candidate, string current)
+    {
+        string[] left = candidate.Split('.');
+        string[] right = current.Split('.');
+        int length = Math.Max(left.Length, right.Length);
+        for (int index = 0; index < length; index++)
+        {
+            int a = 0;
+            int b = 0;
+            if (index < left.Length) int.TryParse(left[index], out a);
+            if (index < right.Length) int.TryParse(right[index], out b);
+            if (a != b) return a > b;
+        }
+        return false;
     }
 }

@@ -173,6 +173,8 @@ export interface MessageQuery {
   accountId?: string
   folderId?: string
   role?: FolderRole
+  /** Фильтр по домену почты (все ящики @itxr.ru и т.п.). */
+  domain?: string
   /** Поисковый запрос; пустая строка — без фильтра. */
   query?: string
   unreadOnly?: boolean

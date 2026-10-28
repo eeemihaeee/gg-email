@@ -37,16 +37,29 @@ export default function MessageList(): React.JSX.Element {
 
   const title =
     selection.kind === 'unified'
-      ? activeAccount
+      ? selection.domain
+        ? `Входящие — ${selection.domain}`
+        : activeAccount
         ? `Входящие — ${activeAccount.displayName || activeAccount.email}`
         : 'Все входящие'
       : activeFolder?.name ?? 'Папка'
 
   const sync = useStore((state) => state.sync)
+  const accountsForSelection = selection.domain
+    ? accounts.filter((account) =>
+        account.email.toLowerCase().endsWith('@' + selection.domain!.toLowerCase())
+      )
+    : accounts
   const accountError = selection.accountId
     ? sync[selection.accountId]?.error
-    : Object.values(sync).find((status) => status.error)?.error
-  const accountPhase = selection.accountId ? sync[selection.accountId]?.phase : undefined
+    : selection.domain
+      ? accountsForSelection.map((account) => sync[account.id]?.error).find(Boolean)
+      : Object.values(sync).find((status) => status.error)?.error
+  const accountPhase = selection.accountId
+    ? sync[selection.accountId]?.phase
+    : selection.domain
+      ? accountsForSelection.map((account) => sync[account.id]?.phase).find(Boolean)
+      : undefined
 
   return (
     <section className="list-pane">

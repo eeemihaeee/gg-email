@@ -19,6 +19,8 @@ export interface ViewSelection {
   kind: 'unified' | 'folder'
   accountId?: string
   folderId?: string
+  /** Показывать входящие всех ящиков домена (например, itxr.ru). */
+  domain?: string
 }
 
 export interface ComposeAttachment {
@@ -82,6 +84,7 @@ interface Store {
   closeOverlay(): void
 
   selectUnified(accountId?: string): Promise<void>
+  selectDomain(domain: string): Promise<void>
   selectFolder(folderId: string): Promise<void>
   refreshFolders(): Promise<void>
   setQuery(query: string): Promise<void>
@@ -215,6 +218,16 @@ export const useStore = create<Store>()((set, get) => ({
     await get().loadMessages(true)
   },
 
+  async selectDomain(domain) {
+    set({
+      selection: { kind: 'unified', domain },
+      selectedId: null,
+      detail: null,
+      query: ''
+    })
+    await get().loadMessages(true)
+  },
+
   async selectFolder(folderId) {
     const folder = get().folders.find((item) => item.id === folderId)
     set({
@@ -244,6 +257,7 @@ export const useStore = create<Store>()((set, get) => ({
     try {
       const page = await window.kurier.messages.list({
         accountId: selection.accountId,
+        domain: selection.domain,
         folderId: selection.kind === 'folder' ? selection.folderId : undefined,
         role: selection.kind === 'unified' ? 'inbox' : undefined,
         query: query.trim() || undefined,

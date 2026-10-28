@@ -426,6 +426,14 @@ export function installDemoApi(): void {
       list: async (query) => {
         let items = state.messages
         if (query.accountId) items = items.filter((item) => item.accountId === query.accountId)
+        if (query.domain) {
+          const ids = new Set(
+            accounts
+              .filter((account) => account.email.toLowerCase().endsWith('@' + query.domain!.toLowerCase()))
+              .map((account) => account.id)
+          )
+          items = items.filter((item) => ids.has(item.accountId))
+        }
         if (query.folderId) items = items.filter((item) => item.folderId === query.folderId)
         if (query.role) {
           const roleFolders = new Set(

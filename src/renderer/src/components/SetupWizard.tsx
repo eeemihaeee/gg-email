@@ -130,6 +130,11 @@ export default function SetupWizard(): React.JSX.Element {
   }
 
   const test = async (): Promise<void> => {
+    if (!form.password.trim()) {
+      setError('Сначала введите пароль приложения — без него серверу нечего проверять')
+      setTestResult(null)
+      return
+    }
     setBusy(true)
     setError(null)
     setTestResult(null)
@@ -277,12 +282,26 @@ export default function SetupWizard(): React.JSX.Element {
             {form.authKind !== 'oauth2' &&
               (form.oauthProvider === 'google' || form.oauthProvider === 'yandex') &&
               !oauthConfigured && (
-                <div className="form-info">
-                  OAuth для {form.oauthProvider === 'google' ? 'Gmail' : 'Яндекса'} не настроен
-                  администратором. Используйте пароль приложения:{' '}
-                  {form.oauthProvider === 'google'
-                    ? 'Google Аккаунт → Безопасность → Пароли приложений (нужна 2FA).'
-                    : 'Яндекс ID → Безопасность → Пароли приложений.'}
+                <div className="form-hint oauth-hint">
+                  <div>
+                    Вход через OAuth для {form.oauthProvider === 'google' ? 'Gmail' : 'Яндекса'} не
+                    настроен. Это не ошибка — используйте пароль приложения:{' '}
+                    {form.oauthProvider === 'google'
+                      ? 'Google Аккаунт → Безопасность → Пароли приложений (нужна 2FA).'
+                      : 'Яндекс ID → Безопасность → Пароли приложений.'}
+                  </div>
+                  <button
+                    className="btn compact"
+                    onClick={() =>
+                      void window.kurier.app.openExternal(
+                        form.oauthProvider === 'google'
+                          ? 'https://myaccount.google.com/apppasswords'
+                          : 'https://id.yandex.ru/security/app-passwords'
+                      )
+                    }
+                  >
+                    Открыть страницу паролей
+                  </button>
                 </div>
               )}
 
@@ -362,7 +381,7 @@ export default function SetupWizard(): React.JSX.Element {
               <button className="btn ghost" onClick={() => setStep('email')}>
                 Назад
               </button>
-              <button className="btn" onClick={() => void test()} disabled={busy}>
+              <button className="btn" onClick={() => void test()} disabled={busy || !form.password.trim()}>
                 Проверить подключение
               </button>
               <span className="flex-spacer" />
