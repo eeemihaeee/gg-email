@@ -27,8 +27,8 @@ function transportOptions(endpoint: ServerEndpoint, auth: AuthOptions) {
     secure: endpoint.security === 'tls',
     requireTLS: endpoint.security === 'starttls',
     auth: authConfig,
-    connectionTimeout: 20_000,
-    greetingTimeout: 15_000,
+    connectionTimeout: 12_000,
+    greetingTimeout: 10_000,
     socketTimeout: 60_000,
     tls: {
       servername: endpoint.host,

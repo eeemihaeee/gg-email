@@ -158,7 +158,7 @@ export default function SetupWizard(): React.JSX.Element {
     }
     setBusy(true)
     setError(null)
-    setTestResult(null)
+    setTestResult('Проверяем IMAP и SMTP…')
     try {
       const input = toInput()
       const result = await window.kurier.accounts.test(input)

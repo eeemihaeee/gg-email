@@ -130,7 +130,13 @@ export function createApiHandlers(
     if (input.password) {
       secrets.set(account.id, input.password, input.authKind ?? 'password')
     }
-    await ctx.startAccount(account.id)
+    // Синхронизация запускается в фоне: мастер закрывается сразу, а прогресс
+    // виден в статусе аккаунта. Иначе добавление «висит» на первом syncAll.
+    void ctx.startAccount(account.id).catch((error: unknown) => {
+      const message = error instanceof Error ? error.message : String(error)
+      log.warn('Не удалось запустить синхронизацию', message)
+      ctx.toast({ kind: 'error', message: `Не удалось подключиться: ${message}` })
+    })
     return account
   })
 

@@ -37,7 +37,8 @@ export function buildClientOptions(
     auth,
     logger: false,
     socketTimeout: 120_000,
-    greetingTimeout: 20_000,
+    greetingTimeout: 15_000,
+    connectionTimeout: 12_000,
     tls: {
       servername: endpoint.host,
       minVersion: 'TLSv1.2',
