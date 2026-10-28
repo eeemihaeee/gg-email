@@ -135,10 +135,10 @@ async function exchangeToken(
   }
 }
 
-function listen(server: Server): Promise<number> {
+function listen(server: Server, port = 0): Promise<number> {
   return new Promise((resolve, reject) => {
     server.once('error', reject)
-    server.listen(0, '127.0.0.1', () => {
+    server.listen(port, '127.0.0.1', () => {
       const address = server.address()
       if (typeof address === 'object' && address) resolve(address.port)
       else reject(new Error('Не удалось определить порт'))
@@ -167,7 +167,15 @@ export async function authorize(
   const state = base64url(randomBytes(16))
 
   const server = createServer()
-  const port = await listen(server)
+  // Фиксированный порт нужен Яндексу: redirect_uri должен совпадать с
+  // зарегистрированным в OAuth-приложении. Если порт занят — берём случайный.
+  const preferredPort = Number(process.env.GGEMAIL_OAUTH_PORT ?? 34123)
+  let port: number
+  try {
+    port = await listen(server, preferredPort)
+  } catch {
+    port = await listen(server, 0)
+  }
   const redirectUri = `http://127.0.0.1:${port}/oauth/callback`
 
   const config = PROVIDERS[provider]
