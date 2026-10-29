@@ -29,6 +29,9 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
+      - name: Prepare Electron binary
+        run: node node_modules/electron/install.js
+
       - name: Unit tests
         run: npm test
 
@@ -73,6 +76,9 @@ jobs:
 
       - name: Typecheck
         run: npm run typecheck
+
+      - name: Prepare Electron binary
+        run: node node_modules/electron/install.js
 
       - name: Unit tests
         run: npm test
