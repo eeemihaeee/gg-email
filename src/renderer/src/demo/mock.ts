@@ -563,7 +563,8 @@ export function installDemoApi(): void {
     window: {
       minimize: () => undefined,
       maximize: () => undefined,
-      close: () => undefined
+      close: () => undefined,
+      setTheme: () => undefined
     },
     on: () => () => undefined
   }

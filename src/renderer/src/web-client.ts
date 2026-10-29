@@ -166,7 +166,8 @@ export function installWebApi(boot: WebBoot): void {
     window: {
       minimize: () => undefined,
       maximize: () => undefined,
-      close: () => undefined
+      close: () => undefined,
+      setTheme: () => undefined
     },
     on: ((event: string, listener: (payload: never) => void) => {
       const known = Object.values(EVENTS) as string[]

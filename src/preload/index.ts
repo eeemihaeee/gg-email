@@ -116,7 +116,8 @@ const api: KurierApi = {
   window: {
     minimize: () => ipcRenderer.send(CHANNELS.windowMinimize),
     maximize: () => ipcRenderer.send(CHANNELS.windowMaximize),
-    close: () => ipcRenderer.send(CHANNELS.windowClose)
+    close: () => ipcRenderer.send(CHANNELS.windowClose),
+    setTheme: (theme: 'light' | 'dark') => ipcRenderer.send(CHANNELS.windowTheme, theme)
   },
   on: ((event: string, listener: (payload: any) => void) => {
     switch (event) {

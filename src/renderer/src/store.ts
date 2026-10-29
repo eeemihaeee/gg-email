@@ -615,6 +615,11 @@ export function applyTheme(settings: UserSettings | null): void {
     settings.theme === 'system' ? (systemDark ? 'dark' : 'light') : settings.theme
   root.dataset.theme = theme
   root.dataset.density = settings.density
+  try {
+    window.kurier.window.setTheme(theme === 'graphite' ? 'dark' : theme === 'sepia' ? 'light' : theme)
+  } catch {
+    // в веб-режиме заголовка окна нет
+  }
 }
 
 export function folderRoleLabel(role: FolderRole): string {

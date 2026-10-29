@@ -110,8 +110,8 @@ function createWindow(ctx: AppContext): BrowserWindow {
     backgroundColor: '#0f1115',
     titleBarStyle: 'hidden',
     titleBarOverlay: {
-      color: '#0f1115',
-      symbolColor: '#e6e8eb',
+      color: '#f5f5f7',
+      symbolColor: '#171717',
       height: 44
     },
     webPreferences: {

@@ -149,6 +149,8 @@ export default function SettingsPanel(): React.JSX.Element {
                     <option value="system">Как в системе</option>
                     <option value="dark">Тёмная</option>
                     <option value="light">Светлая</option>
+                    <option value="sepia">Тёплая (сепия)</option>
+                    <option value="graphite">Графит</option>
                   </select>
                 </label>
                 <label className="field">

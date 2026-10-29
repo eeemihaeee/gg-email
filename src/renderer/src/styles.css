@@ -1998,3 +1998,38 @@ kbd {
 *:hover::-webkit-scrollbar-thumb {
   background: var(--border);
 }
+
+
+:root[data-theme='sepia'] {
+  --bg: #f6f1e7;
+  --bg-elev: #fffaf0;
+  --bg-elev2: #f1e9db;
+  --bg-hover: #efe5d4;
+  --border: #e0d3bd;
+  --border-soft: #eadfcd;
+  --text: #2c2418;
+  --text-dim: #6f604b;
+  --text-faint: #9a8a72;
+  --accent: #c2410c;
+  --accent-strong: #9a3412;
+  --accent-soft: #fde8d7;
+}
+
+:root[data-theme='graphite'] {
+  --bg: #1b1d21;
+  --bg-elev: #23262b;
+  --bg-elev2: #292d33;
+  --bg-hover: #31363d;
+  --border: #3a4048;
+  --border-soft: #30353c;
+  --text: #e7e9ec;
+  --text-dim: #a3a9b3;
+  --text-faint: #767d88;
+  --accent: #f23c30;
+  --accent-strong: #d9362b;
+  --accent-soft: #3a2422;
+}
+
+.settings-head {
+  padding-right: 160px;
+}

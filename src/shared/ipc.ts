@@ -57,6 +57,7 @@ export const CHANNELS = {
   appDiagnostics: 'app:diagnostics',
   oauthStart: 'oauth:start',
   windowMinimize: 'window:minimize',
+  windowTheme: 'window:theme',
   windowMaximize: 'window:maximize',
   windowClose: 'window:close'
 } as const
@@ -72,7 +73,7 @@ export const EVENTS = {
 
 export interface UserSettings {
   language: 'auto' | 'ru' | 'en'
-  theme: 'system' | 'light' | 'dark'
+  theme: 'system' | 'light' | 'dark' | 'sepia' | 'graphite'
   density: 'comfortable' | 'compact'
   previewPane: 'right' | 'bottom' | 'off'
   notifications: boolean
@@ -155,6 +156,7 @@ export interface KurierApi {
     minimize(): void
     maximize(): void
     close(): void
+    setTheme(theme: 'light' | 'dark'): void
   }
   on(event: typeof EVENTS.syncStatus, listener: (status: SyncStatus) => void): () => void
   on(event: typeof EVENTS.messagesChanged, listener: (payload: ChangesEvent) => void): () => void

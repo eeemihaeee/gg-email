@@ -375,6 +375,16 @@ export function createApiHandlers(
   })
 
   // ------------------------------------------------------------------- окно
+  handle<void>(CHANNELS.windowTheme, (_event, theme: 'light' | 'dark') => {
+    const window = getWindow()
+    if (!window || typeof window.setTitleBarOverlay !== 'function') return
+    window.setTitleBarOverlay({
+      color: theme === 'dark' ? '#17181c' : '#f5f5f7',
+      symbolColor: theme === 'dark' ? '#e6e8eb' : '#171717',
+      height: 44
+    })
+  })
+
   handle<void>(CHANNELS.windowMinimize, () => {
     getWindow()?.minimize()
   })
